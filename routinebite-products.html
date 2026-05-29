@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>누띠 — 맞춤 간식 추천</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=DM+Serif+Display:ital@0;1&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:#F7F4EE;--bark:#2C2416;--moss:#1D9E75;--moss-dark:#0F6E56;--moss-light:#E1F5EE;
+  --sand:#E8E0D0;--sand-dark:#C5B89A;--terra:#C4703A;--terra-light:#FAE8DC;
+  --amber:#D4920A;--amber-light:#FDF3DC;--sky:#2E7DBF;--sky-light:#E1EEF8;
+  --purple:#7C3AED;--purple-light:#EDE9FE;
+  --text:#1a160e;--text-muted:#7a6f5e;--text-light:#b0a690;
+  --border:#e0d8c8;--surface:#ffffff;--radius:16px;--radius-sm:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+
+.header{background:var(--bark);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.logo{font-family:'Gowun Dodum',serif;font-size:20px;color:var(--cream);}
+.logo em{color:var(--moss);font-style:normal;}
+.header-right{display:flex;align-items:center;gap:14px;}
+.header-sub{font-size:12px;color:var(--sand-dark);letter-spacing:.08em;}
+.back-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:var(--sand);font-size:12px;padding:5px 13px;border-radius:99px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:background .15s;}
+.back-btn:hover{background:rgba(255,255,255,.2);}
+
+.persona-bar{background:var(--bark);border-bottom:1px solid rgba(255,255,255,.06);padding:9px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.persona-tag{background:rgba(255,255,255,.08);color:var(--sand);font-size:12px;padding:3px 11px;border-radius:99px;display:flex;align-items:center;gap:4px;}
+.persona-tag span{color:var(--moss);font-weight:600;}
+.persona-edit{margin-left:auto;font-size:11px;color:var(--sand-dark);cursor:pointer;text-decoration:underline;letter-spacing:.05em;}
+
+.hero{background:var(--bark);padding:40px 24px 48px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 120%,rgba(29,158,117,.18) 0%,transparent 70%);pointer-events:none;}
+.hero-eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--moss);margin-bottom:10px;}
+.hero-title{font-family:'DM Serif Display',serif;font-size:clamp(24px,5vw,38px);color:var(--cream);line-height:1.25;margin-bottom:8px;}
+.hero-title em{color:var(--moss);font-style:italic;}
+.hero-desc{font-size:13px;color:var(--sand-dark);max-width:400px;margin:0 auto;}
+
+.filter-wrap{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;position:sticky;top:60px;z-index:100;display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.filter-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light);margin-right:2px;flex-shrink:0;}
+.filter-btn{border:1.5px solid var(--border);border-radius:99px;padding:4px 13px;font-size:12px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--text-muted);font-family:'Noto Sans KR',sans-serif;transition:all .15s;user-select:none;}
+.filter-btn:hover{border-color:var(--moss);color:var(--moss-dark);}
+.filter-btn.active{background:var(--moss);border-color:var(--moss);color:white;}
+.filter-sep{width:1px;height:18px;background:var(--border);flex-shrink:0;}
+.filter-count{font-size:12px;color:var(--text-light);margin-left:auto;white-space:nowrap;}
+
+.grid-wrap{max-width:1100px;margin:0 auto;padding:28px 16px 80px;}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+
+.product-card{background:var(--surface);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);transition:all .2s;cursor:default;display:flex;flex-direction:column;}
+.product-card:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(44,36,22,.1);border-color:var(--sand-dark);}
+.product-card.hidden{display:none;}
+.product-card.matched{border-color:var(--moss);box-shadow:0 0 0 3px rgba(29,158,117,.12);}
+
+.card-img{height:160px;display:flex;align-items:center;justify-content:center;font-size:60px;position:relative;}
+.match-badge{position:absolute;top:10px;right:10px;background:var(--moss);color:white;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;}
+.cat-badge{position:absolute;top:10px;left:10px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;}
+.cat-meat{background:var(--terra-light);color:var(--terra);}
+.cat-fish{background:var(--sky-light);color:var(--sky);}
+.cat-bone{background:#F3E8FF;color:#7C3AED;}
+.cat-veggie{background:#E8F5E1;color:#2E6B1A;}
+.cat-powder{background:var(--amber-light);color:var(--amber);}
+.cat-mixed{background:var(--moss-light);color:var(--moss-dark);}
+
+.card-body{padding:14px 16px 16px;flex:1;display:flex;flex-direction:column;}
+.card-name{font-family:'Gowun Dodum',serif;font-size:15px;color:var(--text);margin-bottom:3px;line-height:1.3;}
+.card-weight{font-size:11px;color:var(--text-light);margin-bottom:10px;}
+.card-desc{font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;flex:1;}
+
+.specs{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+.spec-row{display:flex;flex-direction:column;gap:4px;}
+.spec-labels{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-light);}
+.spec-track{height:2.5px;background:var(--sand);border-radius:99px;position:relative;}
+.spec-fill{position:absolute;left:0;top:0;height:100%;border-radius:99px;background:var(--moss);}
+.spec-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;background:var(--moss-dark);border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.18);}
+.spec-dot.powder{background:var(--amber);}
+
+.tag-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.tag-chip{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500;background:var(--cream);color:var(--text-muted);border:1px solid var(--border);}
+.tag-chip.highlight{background:var(--moss-light);color:var(--moss-dark);border-color:var(--moss);}
+
+.card-footer{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);}
+.match-banner{background:var(--moss);color:white;padding:12px 20px;font-size:13px;display:none;align-items:center;gap:10px;position:sticky;top:106px;z-index:99;}
+.match-banner.show{display:flex;}
+.match-banner-close{margin-left:auto;cursor:pointer;opacity:.7;font-size:16px;}
+
+.empty{text-align:center;padding:60px 20px;color:var(--text-light);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">누<em>띠</em></div>
+  <div class="header-right">
+    <div class="header-sub">Nutti</div>
+    <button class="back-btn" onclick="window.location.href='routinebite-calculator.html'">← 계산기로</button>
+  </div>
+</header>
+
+<div class="persona-bar">
+  <div class="persona-tag" id="pNameTag" style="display:none;">🐾 <span id="pName"></span></div>
+  <div class="persona-tag">🐶 <span id="pBreed">소형견</span></div>
+  <div class="persona-tag">🎂 <span id="pAge">성견</span></div>
+  <div class="persona-tag">⚡ <span id="pAct">보통</span></div>
+  <div class="persona-tag" id="pBcsTag" style="display:none;">⚖️ <span id="pBcs"></span></div>
+  <div class="persona-tag">💚 <span id="pHealth">없음</span></div>
+  <div class="persona-edit" onclick="window.location.href='routinebite-calculator.html'">다시 계산하기 ↗</div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">누띠 · 맞춤 간식 추천</div>
+  <h1 class="hero-title" id="heroTitle">내 강아지에게 <em>딱 맞는</em><br>간식 루틴</h1>
+  <p class="hero-desc" id="heroDesc">국내 제조 프리미엄 수제간식. 견종·연령·건강 상태에 맞는 제품을 추천해 드립니다.</p>
+</div>
+
+<div id="matchBanner" class="match-banner">
+  <span>🎯 <strong id="matchCount">0</strong>개 제품이 추천됩니다</span>
+  <span class="match-banner-close" onclick="document.getElementById('matchBanner').classList.remove('show')">✕</span>
+</div>
+
+<div class="filter-wrap">
+  <span class="filter-label">기능</span>
+  <button class="filter-btn active" onclick="setFilter('all',this)">전체</button>
+  <button class="filter-btn" onclick="setFilter('관절',this)">🦴 관절</button>
+  <button class="filter-btn" onclick="setFilter('피부',this)">🌿 피부·모질</button>
+  <button class="filter-btn" onclick="setFilter('다이어트',this)">🥗 다이어트</button>
+  <button class="filter-btn" onclick="setFilter('빈혈',this)">💊 빈혈·기력</button>
+  <button class="filter-btn" onclick="setFilter('두뇌',this)">🧠 두뇌발달</button>
+  <button class="filter-btn" onclick="setFilter('면역',this)">🛡 면역력</button>
+  <div class="filter-sep"></div>
+  <span class="filter-label">질감</span>
+  <button class="filter-btn" onclick="setFilter('SOFT',this)">SOFT</button>
+  <button class="filter-btn" onclick="setFilter('MIDDLE',this)">MIDDLE</button>
+  <button class="filter-btn" onclick="setFilter('HARD',this)">HARD</button>
+  <button class="filter-btn" onclick="setFilter('분말',this)">분말</button>
+  <div class="filter-count" id="filterCount">27개 제품</div>
+</div>
+
+<div class="grid-wrap">
+  <div class="products-grid" id="productsGrid"></div>
+  <div class="empty" id="emptyState" style="display:none;"><div class="empty-icon">🐾</div><p>조건에 맞는 제품이 없습니다</p></div>
+</div>
+
+<script>
+var PRODUCTS = [
+  {id:1, name:'소창개껌스틱 30cm (2p)', weight:'2p', wholesale:3000, retail:5000,
+   texture:'MIDDLE', texVal:2, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🦴', color:'#FAE8DC', cat:'mixed', catLabel:'혼합',
+   ingredients:'철분, 비타민, 필수지방산',
+   functions:['빈혈','피부','노화방지','알러지예방']},
+  {id:2, name:'소창개껌스틱 20g', weight:'20g', wholesale:2400, retail:4000,
+   texture:'MIDDLE', texVal:2, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🦴', color:'#FAE8DC', cat:'mixed', catLabel:'혼합',
+   ingredients:'철분, 비타민, 필수지방산',
+   functions:['빈혈','피부','노화방지','알러지예방']},
+  {id:3, name:'상어연골', weight:'70g', wholesale:4200, retail:7000,
+   texture:'HARD', texVal:3, age:[2], size:[3,4],
+   emoji:'🦈', color:'#E6F1FB', cat:'bone', catLabel:'뼈·연골',
+   ingredients:'콘드로이틴, 뮤코다당, 칼슘, 특수단백질',
+   functions:['관절','골다공증','뼈건강','신경통']},
+  {id:4, name:'리얼 오리져키', weight:'100g', wholesale:3600, retail:6000,
+   texture:'MIDDLE', texVal:2, age:[1,2], size:[2,3,4],
+   emoji:'🦆', color:'#FAE8DC', cat:'meat', catLabel:'육류',
+   ingredients:'필수지방산, 필수아미노산, 단백질',
+   functions:['알러지예방','두뇌','피부']},
+  {id:5, name:'오리몸통', weight:'1p', wholesale:1500, retail:2500,
+   texture:'HARD', texVal:3, age:[2], size:[2,3,4],
+   emoji:'🦆', color:'#FAE8DC', cat:'meat', catLabel:'육류',
+   ingredients:'단백질, 무기질, 비타민',
+   functions:['다이어트','빈혈','기력']},
+  {id:6, name:'단호박 츄러스 SOFT', weight:'100g', wholesale:3000, retail:5000,
+   texture:'SOFT', texVal:1, age:[1,2], size:[1,2,3,4],
+   emoji:'🎃', color:'#FDF3DC', cat:'veggie', catLabel:'채소',
+   ingredients:'비타민A, 무기질, 베타카로틴',
+   functions:['면역','피부','시력보호','감기예방']},
+  {id:7, name:'황태 츄러스 SOFT', weight:'100g', wholesale:3000, retail:5000,
+   texture:'SOFT', texVal:1, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🐟', color:'#E6F1FB', cat:'fish', catLabel:'수산물',
+   ingredients:'아미노산, 고단백, 저지방',
+   functions:['다이어트','두뇌','기력','신진대사']},
+  {id:8, name:'명태포', weight:'60g', wholesale:3000, retail:5000,
+   texture:'SOFT', texVal:1, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🐟', color:'#E6F1FB', cat:'fish', catLabel:'수산물',
+   ingredients:'아미노산, 고단백, 저지방',
+   functions:['다이어트','두뇌','기력','신진대사']},
+  {id:9, name:'연어분말 팩', weight:'30g', wholesale:1800, retail:3000,
+   texture:'분말', texVal:0, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🐠', color:'#E6F1FB', cat:'powder', catLabel:'분말',
+   ingredients:'오메가3, 불포화지방산, 비타민D',
+   functions:['두뇌','심장','뼈건강','피부']},
+  {id:10, name:'황태분말(통)', weight:'70g', wholesale:6000, retail:10000,
+   texture:'분말', texVal:0, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🐟', color:'#E6F1FB', cat:'powder', catLabel:'분말',
+   ingredients:'아미노산, 고단백, 저지방',
+   functions:['두뇌','기력','다이어트','신진대사']},
+  {id:11, name:'양사골', weight:'4p', wholesale:4200, retail:7000,
+   texture:'HARD', texVal:3, age:[2], size:[3,4],
+   emoji:'🦷', color:'#F3E8FF', cat:'bone', catLabel:'뼈·연골',
+   ingredients:'항암물질(CLA), 다이어트 성분',
+   functions:['관절','다이어트','알러지예방']},
+  {id:12, name:'훈련용 노즈워크 연단고', weight:'100g', wholesale:3600, retail:6000,
+   texture:'SOFT', texVal:1, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🐾', color:'#E1F5EE', cat:'mixed', catLabel:'훈련용',
+   ingredients:'오메가3, 불포화지방산, 비타민D',
+   functions:['두뇌','심장','소화','뼈건강']},
+  {id:13, name:'연어당근 SOFT (몽땅)', weight:'100g', wholesale:3000, retail:5000,
+   texture:'SOFT', texVal:1, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🥕', color:'#E1F5EE', cat:'mixed', catLabel:'혼합',
+   ingredients:'오메가3, 비타민A, 베타카로틴, 섬유질',
+   functions:['두뇌','소화','면역','시력보호','피부']},
+  {id:14, name:'리얼 소고기져키', weight:'100g', wholesale:3600, retail:6000,
+   texture:'MIDDLE', texVal:2, age:[1,2], size:[2,3,4],
+   emoji:'🥩', color:'#FCEBEB', cat:'meat', catLabel:'육류',
+   ingredients:'철분, 비타민, 고단백, 저지방',
+   functions:['빈혈','피부','다이어트','신진대사']},
+  {id:15, name:'리얼 참치져키', weight:'100g', wholesale:3600, retail:6000,
+   texture:'MIDDLE', texVal:2, age:[1,2], size:[2,3,4],
+   emoji:'🐟', color:'#E6F1FB', cat:'fish', catLabel:'수산물',
+   ingredients:'칼륨, 항염증 비타민, 고단백, 저지방',
+   functions:['심장','관절','다이어트','신진대사']},
+  {id:16, name:'소허파', weight:'60g × 3', wholesale:3000, retail:5000,
+   texture:'SOFT', texVal:1, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🫁', color:'#FCEBEB', cat:'meat', catLabel:'육류',
+   ingredients:'철분, 비타민, 고단백, 저지방',
+   functions:['빈혈','피부','다이어트','신진대사']},
+  {id:17, name:'소간', weight:'100g', wholesale:4200, retail:7000,
+   texture:'MIDDLE', texVal:2, age:[1,2], size:[1,2,3,4],
+   emoji:'🫀', color:'#FCEBEB', cat:'meat', catLabel:'육류',
+   ingredients:'철분, 비타민, 고단백, 저지방',
+   functions:['빈혈','피부','다이어트','신진대사']},
+  {id:18, name:'돼지귀 (대용량)', weight:'300g', wholesale:8400, retail:14000,
+   texture:'MIDDLE', texVal:2, age:[1,2], size:[1,2,3,4],
+   emoji:'🐷', color:'#FAE8DC', cat:'meat', catLabel:'육류',
+   ingredients:'콜라겐, 비타민, 고단백, 저지방',
+   functions:['피부','노화방지','관절','다이어트']},
+  {id:19, name:'오메가 MSM + 연어분말(통)', weight:'100g', wholesale:9600, retail:16000,
+   texture:'분말', texVal:0, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🐠', color:'#E6F1FB', cat:'powder', catLabel:'분말',
+   ingredients:'오메가3, 불포화지방산, 비타민D',
+   functions:['두뇌','심장','관절','뼈건강']},
+  {id:20, name:'소간분말(통)', weight:'70g', wholesale:4200, retail:7000,
+   texture:'분말', texVal:0, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🫀', color:'#FCEBEB', cat:'powder', catLabel:'분말',
+   ingredients:'철분, 고단백, 저지방, 비타민',
+   functions:['빈혈','피부','다이어트','신진대사']},
+  {id:21, name:'황태포', weight:'50g', wholesale:3600, retail:6000,
+   texture:'SOFT', texVal:1, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🐟', color:'#E6F1FB', cat:'fish', catLabel:'수산물',
+   ingredients:'필수아미노산, 고단백, 저지방',
+   functions:['다이어트','두뇌','기력','신진대사']},
+  {id:22, name:'황태포 (대용량)', weight:'50g × 3', wholesale:9000, retail:15000,
+   texture:'SOFT', texVal:1, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🐟', color:'#E6F1FB', cat:'fish', catLabel:'수산물',
+   ingredients:'필수아미노산, 고단백, 저지방',
+   functions:['다이어트','두뇌','기력','신진대사']},
+  {id:23, name:'저온건조 연근(통)', weight:'50g', wholesale:5400, retail:9000,
+   texture:'HARD', texVal:3, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🌿', color:'#E8F5E1', cat:'veggie', catLabel:'채소',
+   ingredients:'비타민C, 식이섬유, 무기질',
+   functions:['소화','면역','신진대사']},
+  {id:24, name:'저온건조 당근(통)', weight:'50g', wholesale:5400, retail:9000,
+   texture:'HARD', texVal:3, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🥕', color:'#FDF3DC', cat:'veggie', catLabel:'채소',
+   ingredients:'베타카로틴, 비타민A, 식이섬유',
+   functions:['다이어트','시력보호','면역','소화']},
+  {id:25, name:'저온건조 완두콩(통)', weight:'50g', wholesale:5400, retail:9000,
+   texture:'HARD', texVal:3, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🫘', color:'#E8F5E1', cat:'veggie', catLabel:'채소',
+   ingredients:'단백질, 식이섬유, 비타민K',
+   functions:['다이어트','소화','뼈건강']},
+  {id:26, name:'저온건조 청무(통)', weight:'50g', wholesale:5400, retail:9000,
+   texture:'HARD', texVal:3, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🌱', color:'#E8F5E1', cat:'veggie', catLabel:'채소',
+   ingredients:'비타민C, 식이섬유, 칼슘',
+   functions:['소화','면역','신진대사']},
+  {id:27, name:'저온건조 단호박(통)', weight:'50g', wholesale:5400, retail:9000,
+   texture:'HARD', texVal:3, age:[1,2,3,4], size:[1,2,3,4],
+   emoji:'🎃', color:'#FDF3DC', cat:'veggie', catLabel:'채소',
+   ingredients:'비타민A, 베타카로틴, 식이섬유',
+   functions:['면역','피부','시력보호','소화']},
+];
+
+var profile = {name:'', breed:'', age:'성견', size:'소형견', activity:'보통', health:[], bcs:'', weight:''};
+var currentFilter = 'all';
+
+function isMatched(p) {
+  var ageMap = {'자견':1,'성견':2,'노령견':3};
+  var ageVal = ageMap[profile.age]||2;
+  var sizeMap = {'소형견':2,'중대형견':3,'모든견종':4};
+  var sizeVal = sizeMap[profile.size]||2;
+  var ageOk = p.age.indexOf(4)>-1 || p.age.indexOf(ageVal)>-1;
+  var sizeOk = p.size.indexOf(4)>-1 || p.size.indexOf(sizeVal)>-1;
+  var healthOk = profile.health.length===0 || profile.health.some(function(h){
+    return p.functions.some(function(f){return f.indexOf(h)>-1||h.indexOf(f)>-1;});
+  });
+  return ageOk && sizeOk && healthOk;
+}
+
+function makeSpec(labels, pct, isPowder) {
+  return '<div class="spec-row">' +
+    '<div class="spec-labels">'+labels.map(function(l){return '<span>'+l+'</span>';}).join('')+'</div>' +
+    '<div class="spec-track">' +
+      '<div class="spec-fill" style="width:'+pct+'%"></div>' +
+      '<div class="spec-dot'+(isPowder?' powder':'')+'" style="left:'+pct+'%"></div>' +
+    '</div></div>';
+}
+
+function pct(val, min, max){ return Math.round((val-min)/(max-min)*100); }
+
+var FILTER_MAP = {
+  '관절': ['관절','골다공증','뼈건강','신경통'],
+  '피부': ['피부','모질','노화방지','알러지예방'],
+  '다이어트': ['다이어트','저지방'],
+  '빈혈': ['빈혈','기력'],
+  '두뇌': ['두뇌'],
+  '면역': ['면역','감기예방','시력보호'],
+};
+
+function filterMatch(p, f) {
+  if(f==='all') return true;
+  if(f==='SOFT') return p.texture==='SOFT';
+  if(f==='MIDDLE') return p.texture==='MIDDLE';
+  if(f==='HARD') return p.texture==='HARD';
+  if(f==='분말') return p.texture==='분말';
+  var keys = FILTER_MAP[f]||[f];
+  return p.functions.some(function(fn){ return keys.some(function(k){return fn.indexOf(k)>-1||k.indexOf(fn)>-1;}); });
+}
+
+function renderCards() {
+  var grid = document.getElementById('productsGrid');
+  var matched = 0, visible = 0;
+  grid.innerHTML = PRODUCTS.map(function(p){
+    var isMatch = isMatched(p);
+    if(isMatch) matched++;
+    var show = filterMatch(p, currentFilter);
+    if(show) visible++;
+    var texPct = p.texture==='분말' ? 0 : pct(p.texVal,1,3);
+    var agePct = p.age.indexOf(4)>-1 ? 100 : pct(Math.max.apply(null,p.age),1,4);
+    var sizePct = p.size.indexOf(4)>-1 ? 100 : pct(Math.max.apply(null,p.size),1,4);
+    var isPowder = p.texture==='분말';
+    var mClass = p.margin>=35?'margin-good':p.margin>=20?'margin-mid':'margin-low';
+    var hlFns = p.functions.slice(0,3).map(function(f){
+      var isHL = profile.health.length>0 && profile.health.some(function(h){return f.indexOf(h)>-1||h.indexOf(f)>-1;});
+      return '<span class="tag-chip'+(isHL?' highlight':'')+'">'+f+'</span>';
+    }).join('');
+    return '<div class="product-card'+(isMatch?' matched':'')+(show?'':' hidden')+'">' +
+      '<div class="card-img" style="background:'+p.color+';">' +
+        '<span>'+p.emoji+'</span>' +
+        (isMatch?'<div class="match-badge">✦ 추천</div>':'')+
+        '<span class="cat-badge cat-'+p.cat+'">'+p.catLabel+'</span>'+
+      '</div>'+
+      '<div class="card-body">'+
+        '<div class="card-name">'+p.name+'</div>'+
+        '<div class="card-weight">'+p.weight+'</div>'+
+        '<div class="specs">'+
+          (isPowder
+            ? '<div class="spec-row"><div class="spec-labels"><span>분말형 제품</span></div><div class="spec-track"><div class="spec-dot powder" style="left:0%;top:50%;transform:translate(-50%,-50%);position:relative;display:inline-block;margin-left:2px;"></div></div></div>'
+            : makeSpec(['SOFT','MIDDLE','HARD'], texPct, false)
+          )+
+          makeSpec(['자견','성견','노령견','전연령'], agePct, false)+
+          makeSpec(['초소형','소형견','중대형','모든견종'], sizePct, false)+
+        '</div>'+
+        '<div class="tag-row">'+hlFns+'</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('filterCount').textContent = visible+'개 제품';
+  var banner = document.getElementById('matchBanner');
+  if(matched>0 && profile.health.length>0){ document.getElementById('matchCount').textContent=matched; banner.classList.add('show'); }
+  else banner.classList.remove('show');
+  document.getElementById('emptyState').style.display = visible===0?'block':'none';
+}
+
+function setFilter(val, el) {
+  currentFilter = val;
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');
+  renderCards();
+}
+
+function parseParams() {
+  var p = new URLSearchParams(window.location.search);
+  if(p.get('name'))   profile.name     = p.get('name');
+  if(p.get('breed'))  profile.breed    = p.get('breed');
+  if(p.get('age'))    profile.age      = p.get('age');
+  if(p.get('size'))   profile.size     = p.get('size');
+  if(p.get('act'))    profile.activity = p.get('act');
+  if(p.get('health')) profile.health   = p.get('health').split(',').filter(Boolean);
+  if(p.get('bcs'))    profile.bcs      = p.get('bcs');
+  if(p.get('weight')) profile.weight   = p.get('weight');
+  if(profile.bcs==='과체중'||profile.bcs==='비만'){
+    if(profile.health.indexOf('다이어트')===-1) profile.health.push('다이어트');
+  }
+}
+
+function updatePersonaBar() {
+  var hasName = profile.name && profile.name!=='우리 강아지';
+  if(hasName){ document.getElementById('pName').textContent=profile.name; document.getElementById('pNameTag').style.display='flex'; }
+  document.getElementById('pBreed').textContent  = (profile.breed?profile.breed+' · ':'')+profile.size;
+  document.getElementById('pAge').textContent    = profile.age;
+  document.getElementById('pAct').textContent    = profile.activity;
+  document.getElementById('pHealth').textContent = profile.health.length?profile.health.join(' · '):'없음';
+  if(profile.bcs&&profile.bcs!=='이상적'){ document.getElementById('pBcs').textContent=profile.bcs; document.getElementById('pBcsTag').style.display='flex'; }
+  var displayName = hasName?profile.name:'내 강아지';
+  document.getElementById('heroTitle').innerHTML = '<em>'+displayName+'</em>에게 딱 맞는<br>간식 루틴';
+  if(profile.breed) document.getElementById('heroDesc').textContent = profile.breed+' · '+profile.age+' 기준으로 맞춤 추천해 드립니다.';
+}
+
+parseParams();
+updatePersonaBar();
+renderCards();
+</script>
+</body>
+</html>
