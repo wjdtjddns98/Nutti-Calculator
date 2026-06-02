@@ -5,23 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>간식 계산기 — 누띠</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=DM+Serif+Display:ital@0;1&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
+  /* NUTTI 브랜드 팔레트 — 상품 페이지(routinebite-products.html)와 통일 */
+  --cream: #F7F4EE; --bark: #2C2416;
   --green: #1D9E75; --green-dark: #0F6E56; --green-light: #E1F5EE; --green-mid: #5DCAA5;
-  --amber: #EF9F27; --amber-light: #FAEEDA; --amber-dark: #633806;
+  --sand: #E8E0D0; --sand-dark: #C5B89A;
+  --terra: #C4703A; --terra-dark: #9E5526; --terra-light: #FAE8DC;
+  --amber: #D4920A; --amber-light: #FDF3DC; --amber-dark: #633806;
   --red: #E24B4A; --red-light: #FCEBEB; --red-dark: #501313;
-  --blue-light: #E6F1FB; --blue-dark: #042C53;
-  --text: #1a1a1a; --text-muted: #6b7280; --text-light: #9ca3af;
-  --bg: #fafaf8; --surface: #ffffff; --border: #e5e7e3; --border-hover: #c8cdc5;
-  --radius: 14px; --radius-sm: 8px;
+  --blue-light: #E1EEF8; --blue-dark: #042C53;
+  --text: #1a160e; --text-muted: #7a6f5e; --text-light: #b0a690;
+  --bg: #F7F4EE; --surface: #ffffff; --border: #e0d8c8; --border-hover: #C5B89A;
+  --radius: 16px; --radius-sm: 10px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
 
-.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-.logo { font-family: 'Gowun Dodum', serif; font-size: 18px; color: var(--green-dark); }
+.header { background: var(--bark); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.logo { font-family: 'Gowun Dodum', serif; font-size: 20px; color: var(--cream); }
 .logo span { color: var(--green); }
+.header-sub { font-size: 12px; color: var(--sand-dark); letter-spacing: 0.04em; }
 
 .container { max-width: 580px; margin: 0 auto; padding: 28px 20px 80px; }
 
@@ -115,14 +120,14 @@ input[type=range] { flex: 1; height: 4px; accent-color: var(--green); cursor: po
 .alert.gray { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
 
 /* Result */
-.result-hero { background: var(--green-dark); border-radius: var(--radius); padding: 26px 22px; color: white; margin-bottom: 14px; position: relative; overflow: hidden; }
-.result-hero::before { content: ''; position: absolute; right: -20px; top: -20px; width: 110px; height: 110px; border-radius: 50%; background: rgba(255,255,255,0.05); }
-.result-hero-label { font-size: 11px; opacity: 0.65; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; }
-.result-dog-name { font-family: 'Gowun Dodum', serif; font-size: 17px; margin-bottom: 14px; opacity: 0.88; }
-.result-big { display: flex; align-items: baseline; gap: 5px; margin-bottom: 3px; }
-.result-num { font-family: 'Gowun Dodum', serif; font-size: 52px; line-height: 1; }
-.result-unit { font-size: 18px; opacity: 0.75; }
-.result-sub { font-size: 13px; opacity: 0.6; }
+.result-hero { background: var(--bark); border-radius: var(--radius); padding: 26px 22px; color: var(--cream); margin-bottom: 14px; position: relative; overflow: hidden; }
+.result-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 70% at 80% 120%, rgba(29,158,117,0.22) 0%, transparent 70%); pointer-events: none; }
+.result-hero-label { font-size: 11px; color: var(--green); opacity: 0.9; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; }
+.result-dog-name { font-family: 'Gowun Dodum', serif; font-size: 17px; margin-bottom: 14px; color: var(--sand); }
+.result-big { display: flex; align-items: baseline; gap: 5px; margin-bottom: 3px; position: relative; }
+.result-num { font-family: 'DM Serif Display', serif; font-size: 54px; line-height: 1; }
+.result-unit { font-size: 18px; color: var(--sand-dark); }
+.result-sub { font-size: 13px; color: var(--sand-dark); }
 
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
@@ -162,8 +167,8 @@ input[type=range] { flex: 1; height: 4px; accent-color: var(--green); cursor: po
 .btn:active { transform: scale(0.98); }
 .btn.primary { background: var(--green); color: white; border-color: var(--green); }
 .btn.primary:hover { background: var(--green-dark); border-color: var(--green-dark); }
-.btn.cta { background: var(--green-dark); color: white; border-color: var(--green-dark); }
-.btn.cta:hover { background: #085041; }
+.btn.cta { background: var(--terra); color: white; border-color: var(--terra); }
+.btn.cta:hover { background: var(--terra-dark); border-color: var(--terra-dark); }
 
 /* BCS */
 .bcs-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; margin-bottom: 10px; }
@@ -188,7 +193,7 @@ input[type=range] { flex: 1; height: 4px; accent-color: var(--green); cursor: po
 
 <header class="header">
   <div class="logo">누<span>띠</span></div>
-  <div style="font-size:12px;color:var(--text-light);">강아지 간식 계산기</div>
+  <div class="header-sub">강아지 간식 계산기</div>
 </header>
 
 <div class="container">
@@ -757,24 +762,4 @@ function goToProducts() {
   var ageLabel  = age==='puppy'?'자견':age==='senior'?'노령견':'성견';
   var sizeLabel = state.breed.size==='소형'?'소형견':state.breed.size==='중형'?'중대형견':'중대형견';
   var actLabel  = {low:'낮음',normal:'보통',high:'높음',vhigh:'매우 높음'}[state.activity];
-  var bcsLabel  = {2:'저체중',4:'약간 마름',5:'이상적',7:'과체중',9:'비만'}[state.bcs]||'이상적';
-
-  var params = new URLSearchParams({
-    name:   name,
-    breed:  state.breed.name,
-    size:   sizeLabel,
-    age:    ageLabel,
-    act:    actLabel,
-    weight: idealWeight.toFixed(1),
-    neuter: state.neuter,
-    health: health.join(','),
-    bcs:    bcsLabel,
-  });
-
-  window.location.href = 'routinebite-products.html?' + params.toString();
-}
-
-initBreeds();
-</script>
-</body>
-</html>
+  var bcsLabel  = {2:'저체중',4:'약간 마름',5:'이상적',7:'과체중',9:'비만'}[state.bcs]
