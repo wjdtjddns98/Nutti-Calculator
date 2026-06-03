@@ -235,9 +235,15 @@ function setFilter(val, el) {
   renderCards();
 }
 
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
 function parseParams() {
   var p = new URLSearchParams(window.location.search);
-  if(p.get('name'))   profile.name     = p.get('name');
+  if(p.get('name'))   profile.name     = p.get('name').slice(0, 20);
   if(p.get('breed'))  profile.breed    = p.get('breed');
   if(p.get('age'))    profile.age      = p.get('age');
   if(p.get('size'))   profile.size     = p.get('size');
@@ -259,7 +265,7 @@ function updatePersonaBar() {
   document.getElementById('pHealth').textContent = profile.health.length?profile.health.join(' · '):'없음';
   if(profile.bcs&&profile.bcs!=='이상적'){ document.getElementById('pBcs').textContent=profile.bcs; document.getElementById('pBcsTag').style.display='flex'; }
   var displayName = hasName?profile.name:'내 강아지';
-  document.getElementById('heroTitle').innerHTML = '<em>'+displayName+'</em>에게 딱 맞는<br>간식 루틴';
+  document.getElementById('heroTitle').innerHTML = '<em>'+escapeHtml(displayName)+'</em>에게 딱 맞는<br>간식 루틴';
   if(profile.breed) document.getElementById('heroDesc').textContent = profile.breed+' · '+profile.age+' 기준으로 맞춤 추천해 드립니다.';
 }
 

@@ -88,6 +88,59 @@ var BCS_HINTS = {
   9: '🚨 비만입니다. 이상체중으로 보정해 계산하며, 간식 허용량을 5%로 제한합니다. (현재 체중 × 0.70)',
 };
 
+/* ── 입력값 검증 유틸 ── */
+// XSS 방지: innerHTML에 사용자 입력을 넣기 전 반드시 이스케이프
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+// 강아지 이름: 공백 정리 + 20자 제한, 비면 기본값
+function getDogNameRaw() {
+  var v = (document.getElementById('dogName').value || '').trim().slice(0, 20);
+  return v || '우리 강아지';
+}
+// 체중: 유한수 + 0.5~60kg 범위로 보정
+function getWeightSafe() {
+  var w = parseFloat(document.getElementById('weightSlider').value);
+  if (!isFinite(w)) return 5;
+  return Math.min(60, Math.max(0.5, w));
+}
+
+/* ── 단계 이동 검증 ── */
+function validateStep(step) {
+  clearStepErrors();
+  if (step === 1) {
+    var raw = (document.getElementById('dogName').value || '').trim();
+    if (raw.length > 20) {
+      showStepError(step, '강아지 이름은 20자 이내로 입력해 주세요.');
+      return false;
+    }
+    var w = parseFloat(document.getElementById('weightSlider').value);
+    if (!isFinite(w) || w < 0.5 || w > 60) {
+      showStepError(step, '체중을 0.5~60kg 범위에서 선택해 주세요.');
+      return false;
+    }
+  }
+  return true;
+}
+function showStepError(step, msg) {
+  var panel = document.getElementById('panel' + step);
+  if (!panel) return;
+  var err = panel.querySelector('.step-error');
+  if (!err) {
+    err = document.createElement('div');
+    err.className = 'step-error alert amber';
+    err.innerHTML = '<span class="alert-icon">⚠️</span><span class="step-error-msg"></span>';
+    panel.insertBefore(err, panel.querySelector('.btn-row'));
+  }
+  err.querySelector('.step-error-msg').textContent = msg;
+  err.style.display = 'flex';
+}
+function clearStepErrors() {
+  document.querySelectorAll('.step-error').forEach(function(e){ e.style.display = 'none'; });
+}
+
 function selectBCS(el, bcs) {
   state.bcs = bcs;
   document.querySelectorAll('.bcs-card').forEach(function(c){c.classList.remove('selected');});
@@ -135,7 +188,26 @@ function selectGroup(group, el, val) {
   el.classList.add('selected');
 }
 
-function toggleTag(el){ el.classList.toggle('selected'); }
+function toggleTag(el){
+  var wrap = el.parentElement;
+  var isNone = el.dataset.val === '없음';
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) {
+    if (isNone) {
+      // '없음' 선택 시 나머지 해제
+      wrap.querySelectorAll('.tag').forEach(function(t){ if (t !== el) t.classList.remove('selected'); });
+    } else {
+      // 일반 항목 선택 시 '없음' 해제
+      var none = wrap.querySelector('.tag[data-val="없음"]');
+      if (none) none.classList.remove('selected');
+    }
+  }
+  // 아무것도 선택 안 됐으면 '없음' 자동 선택 (빈 상태 방지)
+  if (wrap.querySelectorAll('.tag.selected').length === 0) {
+    var none2 = wrap.querySelector('.tag[data-val="없음"]');
+    if (none2) none2.classList.add('selected');
+  }
+}
 
 function getTags(id){
   return Array.from(document.querySelectorAll('#'+id+' .tag.selected')).map(function(t){return t.dataset.val;});
@@ -192,6 +264,9 @@ function getSelectedIngs() {
 
 /* ── Step 이동 ── */
 function goStep(n) {
+  // 앞으로 이동할 때만 현재 단계 입력값 검증
+  if (n > currentStep) { if (!validateStep(currentStep)) return; }
+  else { clearStepErrors(); }
   document.getElementById('panel'+currentStep).classList.remove('active');
   currentStep = n;
   document.getElementById('panel'+currentStep).classList.add('active');
@@ -210,8 +285,9 @@ function goStep(n) {
 
 /* ── 결과 렌더 ── */
 function renderResult() {
-  var name   = document.getElementById('dogName').value.trim() || '우리 강아지';
-  var weight = parseFloat(document.getElementById('weightSlider').value);
+  var name   = getDogNameRaw();
+  var nameSafe = escapeHtml(name);
+  var weight = getWeightSafe();
   var age    = document.getElementById('dogAge').value;
   var health = getTags('healthTags');
   var ings   = getSelectedIngs();
@@ -308,7 +384,7 @@ function renderResult() {
   document.getElementById('resultBody').innerHTML =
     '<div class="result-hero">' +
       '<div class="result-hero-label">하루 권장 간식량</div>' +
-      '<div class="result-dog-name">'+breed.emoji+' '+name+' ('+breed.name+')</div>' +
+      '<div class="result-dog-name">'+breed.emoji+' '+nameSafe+' ('+escapeHtml(breed.name)+')</div>' +
       '<div class="result-big"><span class="result-num">'+treatGram+'</span><span class="result-unit">g / 일</span></div>' +
       '<div class="result-sub">허용 칼로리 '+treatCal+' kcal · 하루 칼로리의 '+Math.round(treatPct*100)+'%</div>' +
     '</div>' +
@@ -331,7 +407,7 @@ function renderResult() {
 
     '<div class="alert blue" style="margin-bottom:14px;">' +
       '<span class="alert-icon">🐾</span>' +
-      '<span><strong>'+breed.name+' 주의사항</strong><br>'+breed.warn+'</span>' +
+      '<span><strong>'+escapeHtml(breed.name)+' 주의사항</strong><br>'+escapeHtml(breed.warn)+'</span>' +
     '</div>' +
 
     '<div class="accuracy-section">' +
@@ -347,9 +423,9 @@ function renderResult() {
     : '') +
 
     '<div class="divider"></div>' +
-    '<div class="section-title">'+name+'에게 맞는 누띠 추천</div>' +
+    '<div class="section-title">'+nameSafe+'에게 맞는 누띠 추천</div>' +
     recs.map(function(r){
-      return '<div class="rec-item"><div><div class="rec-item-name">'+r.name+'</div><div class="rec-item-desc">'+r.desc+'</div></div><span class="rec-badge '+r.bc+'">'+r.badge+'</span></div>';
+      return '<div class="rec-item"><div><div class="rec-item-name">'+escapeHtml(r.name)+'</div><div class="rec-item-desc">'+escapeHtml(r.desc)+'</div></div><span class="rec-badge '+r.bc+'">'+r.badge+'</span></div>';
     }).join('') +
 
     '<div class="disclaimer"><span style="flex-shrink:0;">ℹ️</span><span>본 결과는 수의영양학 공식(RER = 70 × 체중^0.75) 기반 참고값입니다. 정확한 급여량은 담당 수의사와 상담하세요.</span></div>';
@@ -361,8 +437,8 @@ function renderResult() {
 }
 
 function goToProducts() {
-  var name   = document.getElementById('dogName').value.trim() || '우리 강아지';
-  var weight = parseFloat(document.getElementById('weightSlider').value);
+  var name   = getDogNameRaw();
+  var weight = getWeightSafe();
   var age    = document.getElementById('dogAge').value;
   var health = getTags('healthTags').filter(function(h){return h!=='없음';});
   var idealWeight = getIdealWeight(weight, state.bcs);
