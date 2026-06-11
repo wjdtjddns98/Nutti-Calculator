@@ -1,0 +1,125 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1781143581299,
+  "projectRoot": "C:\\Users\\WSCOPY\\Desktop\\계산기\\계산기 프로토타입\\카페24용_간식투여량계산기_mk1",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "css": {
+      "path": "css",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1781143581261,
+      "keyFiles": [
+        "calculator.css",
+        "products.css"
+      ]
+    },
+    "js": {
+      "path": "js",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1781143581261,
+      "keyFiles": [
+        "calculator.js",
+        "products.js"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "js\\calculator.js",
+      "accessCount": 11,
+      "lastAccessed": 1781146563841,
+      "type": "file"
+    },
+    {
+      "path": "index.html",
+      "accessCount": 8,
+      "lastAccessed": 1781147150469,
+      "type": "file"
+    },
+    {
+      "path": "css\\products.css",
+      "accessCount": 8,
+      "lastAccessed": 1781147199056,
+      "type": "file"
+    },
+    {
+      "path": "js\\products.js",
+      "accessCount": 7,
+      "lastAccessed": 1781146446691,
+      "type": "file"
+    },
+    {
+      "path": "routinebite-products.html",
+      "accessCount": 7,
+      "lastAccessed": 1781147166941,
+      "type": "file"
+    },
+    {
+      "path": "css\\calculator.css",
+      "accessCount": 6,
+      "lastAccessed": 1781147188052,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 2,
+      "lastAccessed": 1781146849087,
+      "type": "directory"
+    },
+    {
+      "path": ".claude\\launch.json",
+      "accessCount": 1,
+      "lastAccessed": 1781144121380,
+      "type": "file"
+    },
+    {
+      "path": "css\\theme.css",
+      "accessCount": 1,
+      "lastAccessed": 1781146265861,
+      "type": "file"
+    },
+    {
+      "path": "js\\products-data.js",
+      "accessCount": 1,
+      "lastAccessed": 1781146313635,
+      "type": "file"
+    },
+    {
+      "path": "assets\\nutti-logo.jpg",
+      "accessCount": 1,
+      "lastAccessed": 1781147104720,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

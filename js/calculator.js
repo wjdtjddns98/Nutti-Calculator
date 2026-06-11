@@ -106,6 +106,14 @@ function getWeightSafe() {
   if (!isFinite(w)) return 5;
   return Math.min(60, Math.max(0.5, w));
 }
+// 슬라이더 값 표시 + 트랙 채움(--fill) 동기화
+function updateWeightUI(el) {
+  var v = parseFloat(el.value);
+  if (!isFinite(v)) v = 5;
+  document.getElementById('weightVal').textContent = v.toFixed(1) + 'kg';
+  var min = parseFloat(el.min), max = parseFloat(el.max);
+  el.style.setProperty('--fill', ((v - min) / (max - min) * 100) + '%');
+}
 
 /* ── 단계 이동 검증 ── */
 function validateStep(step) {
@@ -162,10 +170,10 @@ function initBreeds() {
   var grid = document.getElementById('breedGrid');
   grid.innerHTML = BREEDS.map(function(b,i){
     var sizeClass = b.size==='소형'?'size-small':b.size==='중형'?'size-medium':'size-large';
-    return '<div class="breed-card'+(i===0?' selected':'')+'" onclick="pickBreed(this,'+i+')" data-name="'+b.name+'">' +
+    return '<div class="breed-card'+(i===0?' selected':'')+'" data-idx="'+i+'" data-name="'+escapeHtml(b.name)+'">' +
       '<div class="breed-emoji">'+b.emoji+'</div>' +
-      '<div class="breed-name">'+b.name+'</div>' +
-      '<span class="breed-size-tag '+sizeClass+'">'+b.size+'</span>' +
+      '<div class="breed-name">'+escapeHtml(b.name)+'</div>' +
+      '<span class="breed-size-tag '+sizeClass+'">'+escapeHtml(b.size)+'</span>' +
     '</div>';
   }).join('');
 }
@@ -245,10 +253,10 @@ function renderIngGrid() {
       }
     }
 
-    return '<div class="ing-row-sel'+isSel+'" data-val="'+ing.val+'" onclick="toggleIng(this)">' +
+    return '<div class="ing-row-sel'+isSel+'" data-val="'+escapeHtml(ing.val)+'">' +
       '<div class="ing-left">' +
         '<span class="ing-emoji">'+ing.emoji+'</span>' +
-        '<span class="ing-label">'+ing.val+'</span>' +
+        '<span class="ing-label">'+escapeHtml(ing.val)+'</span>' +
         tipHTML +
       '</div>' +
       '<div class="ing-check"></div>' +
@@ -340,27 +348,27 @@ function renderResult() {
     ? '<div class="alert amber"><span class="alert-icon">⚠️</span><span>주의 성분이 있습니다. 소량만 급여하고 반응을 지켜보세요.</span></div>'
     : '<div class="alert green"><span class="alert-icon">✅</span><span>선택하신 성분은 모두 안전합니다.</span></div>';
 
-  /* 상품 추천 — 건강 상태 연동 (실제 제품 데이터 기반) */
+  /* 상품 추천 — 건강 상태 연동 (가격 정보는 보안·정책상 노출하지 않음) */
   var ALL_RECS = [
     // 관절
-    {name:'상어연골', desc:'콘드로이틴·칼슘 고함유 — 관절염·뼈건강에 집중', price:'7,000원 / 70g', badge:'관절 맞춤', bc:'b-purple', cond:'관절'},
-    {name:'오메가 MSM + 연어분말(통)', desc:'오메가3+MSM 관절 케어 기능성 분말', price:'16,000원 / 100g', badge:'관절 맞춤', bc:'b-purple', cond:'관절'},
+    {name:'상어연골', desc:'콘드로이틴·칼슘 고함유 — 관절염·뼈건강에 집중', badge:'관절 맞춤', bc:'b-purple', cond:'관절'},
+    {name:'오메가 MSM + 연어분말(통)', desc:'오메가3+MSM 관절 케어 기능성 분말', badge:'관절 맞춤', bc:'b-purple', cond:'관절'},
     // 피부
-    {name:'리얼 오리져키', desc:'필수지방산·아미노산 — 알러지 예방·피부 건강', price:'6,000원 / 100g', badge:'피부 맞춤', bc:'b-purple', cond:'피부'},
-    {name:'연어분말 팩', desc:'오메가3·비타민D — 피부 윤기·모질 개선', price:'3,000원 / 30g', badge:'피부 맞춤', bc:'b-purple', cond:'피부'},
+    {name:'리얼 오리져키', desc:'필수지방산·아미노산 — 알러지 예방·피부 건강', badge:'피부 맞춤', bc:'b-purple', cond:'피부'},
+    {name:'연어분말 팩', desc:'오메가3·비타민D — 피부 윤기·모질 개선', badge:'피부 맞춤', bc:'b-purple', cond:'피부'},
     // 다이어트
-    {name:'황태 츄러스 SOFT', desc:'고단백 저지방 — 다이어트 중인 강아지 최적', price:'5,000원 / 100g', badge:'다이어트 맞춤', bc:'b-purple', cond:'다이어트'},
-    {name:'저온건조 당근(통)', desc:'베타카로틴·초저칼로리 — 죄책감 없는 간식', price:'9,000원 / 50g', badge:'다이어트 맞춤', bc:'b-purple', cond:'다이어트'},
+    {name:'황태 츄러스 SOFT', desc:'고단백 저지방 — 다이어트 중인 강아지 최적', badge:'다이어트 맞춤', bc:'b-purple', cond:'다이어트'},
+    {name:'저온건조 당근(통)', desc:'베타카로틴·초저칼로리 — 죄책감 없는 간식', badge:'다이어트 맞춤', bc:'b-purple', cond:'다이어트'},
     // 소화
-    {name:'연어당근 SOFT (몽땅)', desc:'오메가3+섬유질 — 소화 촉진·변비 개선', price:'5,000원 / 100g', badge:'소화 맞춤', bc:'b-purple', cond:'소화'},
-    {name:'단호박 츄러스 SOFT', desc:'베타카로틴·무기질 — 소화·면역력 동시', price:'5,000원 / 100g', badge:'소화 맞춤', bc:'b-purple', cond:'소화'},
+    {name:'연어당근 SOFT (몽땅)', desc:'오메가3+섬유질 — 소화 촉진·변비 개선', badge:'소화 맞춤', bc:'b-purple', cond:'소화'},
+    {name:'단호박 츄러스 SOFT', desc:'베타카로틴·무기질 — 소화·면역력 동시', badge:'소화 맞춤', bc:'b-purple', cond:'소화'},
     // 빈혈·기력
-    {name:'소허파', desc:'철분·비타민 고함유 — 빈혈·기력 회복', price:'5,000원 / 60g×3', badge:'기력 맞춤', bc:'b-purple', cond:'빈혈'},
-    {name:'소간', desc:'철분·비타민 — 빈혈·눈건강·피부 케어', price:'7,000원 / 100g', badge:'기력 맞춤', bc:'b-purple', cond:'빈혈'},
+    {name:'소허파', desc:'철분·비타민 고함유 — 빈혈·기력 회복', badge:'기력 맞춤', bc:'b-purple', cond:'빈혈'},
+    {name:'소간', desc:'철분·비타민 — 빈혈·눈건강·피부 케어', badge:'기력 맞춤', bc:'b-purple', cond:'빈혈'},
     // 기본 추천 (조건 없을 때)
-    {name:'훈련용 노즈워크 연단고', desc:'소프트 질감 — 훈련 포상·노즈워크 전용', price:'6,000원 / 100g', badge:'인기', bc:'b-green', cond:null},
-    {name:'소창개껌스틱 20g', desc:'철분·비타민·필수지방산 — 전연령 모든 견종', price:'4,000원 / 20g', badge:'추천', bc:'b-green', cond:null},
-    {name:'황태포', desc:'필수아미노산·고단백 저지방 — 전연령 기호성 높음', price:'6,000원 / 50g', badge:'추천', bc:'b-green', cond:null},
+    {name:'훈련용 노즈워크 연단고', desc:'소프트 질감 — 훈련 포상·노즈워크 전용', badge:'인기', bc:'b-green', cond:null},
+    {name:'소창개껌스틱 20g', desc:'철분·비타민·필수지방산 — 전연령 모든 견종', badge:'추천', bc:'b-green', cond:null},
+    {name:'황태포', desc:'필수아미노산·고단백 저지방 — 전연령 기호성 높음', badge:'추천', bc:'b-green', cond:null},
   ];
 
   // 건강 상태 매칭 추천 3개 선택
@@ -383,17 +391,20 @@ function renderResult() {
   document.getElementById('resultHeading').textContent = name+'의 맞춤 결과';
   document.getElementById('resultBody').innerHTML =
     '<div class="result-hero">' +
-      '<div class="result-hero-label">하루 권장 간식량</div>' +
+      '<div class="result-hero-label">Daily Treat · 하루 권장 간식량</div>' +
       '<div class="result-dog-name">'+breed.emoji+' '+nameSafe+' ('+escapeHtml(breed.name)+')</div>' +
-      '<div class="result-big"><span class="result-num">'+treatGram+'</span><span class="result-unit">g / 일</span></div>' +
-      '<div class="result-sub">허용 칼로리 '+treatCal+' kcal · 하루 칼로리의 '+Math.round(treatPct*100)+'%</div>' +
+      '<div class="result-big"><span class="result-num" id="resultNum">0</span><span class="result-unit">g / 일</span></div>' +
+      '<div class="result-chips">' +
+        '<span class="r-chip">🔥 허용 칼로리 '+treatCal+' kcal</span>' +
+        '<span class="r-chip">하루 칼로리의 '+Math.round(treatPct*100)+'%</span>' +
+      '</div>' +
     '</div>' +
 
     '<div class="stat-grid">' +
-      '<div class="stat-card"><div class="stat-label">하루 권장 칼로리</div><div class="stat-value">'+dailyCal+' kcal</div></div>' +
-      '<div class="stat-card"><div class="stat-label">체중'+(isBcsAdjusted?' (보정값)':'')+'</div><div class="stat-value">'+idealWeight.toFixed(1)+' kg'+(isBcsAdjusted?' <span style="font-size:10px;color:var(--text-light);">입력 '+weight.toFixed(1)+'kg</span>':'')+'</div></div>' +
-      '<div class="stat-card"><div class="stat-label">체형 (BCS)</div><div class="stat-value" style="font-size:13px;">'+bcsLabel+'</div></div>' +
-      '<div class="stat-card"><div class="stat-label">중성화 / 활동량</div><div class="stat-value" style="font-size:13px;">'+(state.neuter==='Y'?'완료':'미완료')+' / '+actLabel+'</div></div>' +
+      '<div class="stat-card"><div class="stat-label">🔥 하루 권장 칼로리</div><div class="stat-value">'+dailyCal+' kcal</div></div>' +
+      '<div class="stat-card"><div class="stat-label">⚖️ 체중'+(isBcsAdjusted?' (보정값)':'')+'</div><div class="stat-value">'+idealWeight.toFixed(1)+' kg'+(isBcsAdjusted?' <span style="font-size:10px;color:var(--text-light);">입력 '+weight.toFixed(1)+'kg</span>':'')+'</div></div>' +
+      '<div class="stat-card"><div class="stat-label">🐕 체형 (BCS)</div><div class="stat-value" style="font-size:13px;">'+bcsLabel+'</div></div>' +
+      '<div class="stat-card"><div class="stat-label">✂️ 중성화 / 활동량</div><div class="stat-value" style="font-size:13px;">'+(state.neuter==='Y'?'완료':'미완료')+' / '+actLabel+'</div></div>' +
     '</div>' +
 
     (isBcsAdjusted ?
@@ -425,7 +436,7 @@ function renderResult() {
     '<div class="divider"></div>' +
     '<div class="section-title">'+nameSafe+'에게 맞는 누띠 추천</div>' +
     recs.map(function(r){
-      return '<div class="rec-item"><div><div class="rec-item-name">'+escapeHtml(r.name)+'</div><div class="rec-item-desc">'+escapeHtml(r.desc)+'</div></div><span class="rec-badge '+r.bc+'">'+r.badge+'</span></div>';
+      return '<div class="rec-item"><div><div class="rec-item-name">'+escapeHtml(r.name)+'</div><div class="rec-item-desc">'+escapeHtml(r.desc)+'</div></div><span class="rec-badge '+r.bc+'">'+escapeHtml(r.badge)+'</span></div>';
     }).join('') +
 
     '<div class="disclaimer"><span style="flex-shrink:0;">ℹ️</span><span>본 결과는 수의영양학 공식(RER = 70 × 체중^0.75) 기반 참고값입니다. 정확한 급여량은 담당 수의사와 상담하세요.</span></div>';
@@ -434,6 +445,24 @@ function renderResult() {
     var el = document.getElementById('accFill');
     if(el) el.style.width = accuracy+'%';
   }, 100);
+
+  // 결과 숫자 카운트업 애니메이션
+  var numEl = document.getElementById('resultNum');
+  if (numEl) {
+    if (window.requestAnimationFrame) {
+      var dur = 700, startT = null;
+      var tick = function(t){
+        if (startT === null) startT = t;
+        var p = Math.min(1, (t - startT) / dur);
+        p = 1 - Math.pow(1 - p, 3); // ease-out
+        numEl.textContent = Math.round(treatGram * p);
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    } else {
+      numEl.textContent = treatGram;
+    }
+  }
 }
 
 function goToProducts() {
@@ -463,4 +492,31 @@ function goToProducts() {
   window.location.href = 'routinebite-products.html?' + params.toString();
 }
 
+/* ── 이벤트 바인딩 (inline 핸들러 제거 — CSP 대응) ── */
+document.addEventListener('click', function(e){
+  // 단계 이동 버튼
+  var nav = e.target.closest('[data-goto]');
+  if (nav) { goStep(parseInt(nav.dataset.goto, 10)); return; }
+  // 상품 페이지 이동 CTA
+  if (e.target.closest('[data-action="products"]')) { goToProducts(); return; }
+  // 견종 카드
+  var breed = e.target.closest('.breed-card');
+  if (breed) { pickBreed(breed, parseInt(breed.dataset.idx, 10)); return; }
+  // BCS 카드
+  var bcs = e.target.closest('.bcs-card');
+  if (bcs) { selectBCS(bcs, parseInt(bcs.dataset.bcs, 10)); return; }
+  // 중성화/활동량 선택 카드
+  var choice = e.target.closest('.choice-card');
+  if (choice && choice.dataset.group) { selectGroup(choice.dataset.group, choice, choice.dataset.val); return; }
+  // 건강 태그
+  var tag = e.target.closest('#healthTags .tag');
+  if (tag) { toggleTag(tag); return; }
+  // 성분 행
+  var ing = e.target.closest('.ing-row-sel');
+  if (ing) { toggleIng(ing); return; }
+});
+document.querySelector('.breed-search').addEventListener('input', function(){ filterBreeds(this.value); });
+document.getElementById('weightSlider').addEventListener('input', function(){ updateWeightUI(this); });
+
 initBreeds();
+updateWeightUI(document.getElementById('weightSlider'));
