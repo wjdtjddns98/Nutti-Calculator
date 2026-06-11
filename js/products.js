@@ -39,14 +39,17 @@ function fitsAgeSize(p) {
   var sizeOk = p.size.indexOf(4)>-1 || p.size.indexOf(sizeVal)>-1;
   return ageOk && sizeOk;
 }
-// 추천 점수: 연령·크기 맞고, 건강 특이사항을 해결할수록 높음 (0이면 추천 아님)
+// 강아지의 건강 고민 중 이 제품이 해결해주는 항목들
+function matchedConcerns(p) {
+  if (profile.health.length === 0) return [];
+  if (!fitsAgeSize(p)) return [];
+  return profile.health.filter(function(h){
+    return p.functions.some(function(f){ return f.indexOf(h)>-1 || h.indexOf(f)>-1; });
+  });
+}
+// 추천 점수: 해결하는 건강 고민 개수 (0이면 추천 아님)
 function recScore(p) {
-  if (profile.health.length === 0) return 0;
-  if (!fitsAgeSize(p)) return 0;
-  return profile.health.reduce(function(acc, h){
-    var hit = p.functions.some(function(f){ return f.indexOf(h)>-1 || h.indexOf(f)>-1; });
-    return acc + (hit ? 1 : 0);
-  }, 0);
+  return matchedConcerns(p).length;
 }
 
 function makeSpec(labels, pct, isPowder) {
@@ -80,7 +83,7 @@ function filterMatch(p, f) {
 }
 
 /* ── 카드 1개 HTML ── */
-function cardHTML(p, isRec, show) {
+function cardHTML(p, isRec, show, concerns) {
   var texPct = p.texture==='분말' ? 0 : pct(p.texVal,1,3);
   var agePct = p.age.indexOf(4)>-1 ? 100 : pct(Math.max.apply(null,p.age),1,4);
   var sizePct = p.size.indexOf(4)>-1 ? 100 : pct(Math.max.apply(null,p.size),1,4);
@@ -93,13 +96,20 @@ function cardHTML(p, isRec, show) {
   var footerHTML = link
     ? '<div class="card-footer"><a class="card-link" href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">자사몰에서 보기 →</a></div>'
     : '';
+  // 추천 이유 배지: 강아지 고민 중 이 제품이 맞는 항목(최대 2개)
+  var reason = (concerns && concerns.length)
+    ? '✦ ' + concerns.slice(0,2).join('·') + ' 맞춤'
+    : '';
+  var reasonHTML = reason
+    ? '<div class="reason-tag">'+escapeHtml(reason)+'</div>'
+    : '';
   return '<div class="product-card'+(isRec?' matched':'')+(show?'':' hidden')+'">' +
     '<div class="card-img" style="background-color:'+safeColor(p.color)+';">' +
       '<span>'+p.emoji+'</span>' +
-      (isRec?'<div class="match-badge">✦ 추천</div>':'')+
       '<span class="cat-badge cat-'+escapeHtml(p.cat)+'">'+escapeHtml(p.catLabel)+'</span>'+
     '</div>'+
     '<div class="card-body">'+
+      reasonHTML+
       '<div class="card-name">'+escapeHtml(p.name)+'</div>'+
       '<div class="card-weight">'+escapeHtml(p.weight)+'</div>'+
       '<div class="specs">'+
@@ -118,10 +128,10 @@ function cardHTML(p, isRec, show) {
 
 /* ── 렌더 ── */
 function renderCards() {
-  // 추천 점수 부여 + 추천 우선 정렬(동점은 원래 순서 유지 — 안정 정렬)
+  // 추천 이유·점수 부여 + 추천 우선 정렬(동점은 원래 순서 유지 — 안정 정렬)
   var list = PRODUCTS.map(function(p, i){
-    var s = recScore(p);
-    return { p:p, score:s, rec:s>0, idx:i };
+    var concerns = matchedConcerns(p);
+    return { p:p, concerns:concerns, score:concerns.length, rec:concerns.length>0, idx:i };
   });
   var recCount = list.filter(function(x){ return x.rec; }).length;
   list.sort(function(a, b){ return (b.score - a.score) || (a.idx - b.idx); });
@@ -131,7 +141,7 @@ function renderCards() {
     var inView = (currentView === 'all') || x.rec;
     var show = inView && filterMatch(x.p, currentFilter);
     if (show) visible++;
-    return cardHTML(x.p, x.rec, show);
+    return cardHTML(x.p, x.rec, show, x.concerns);
   }).join('');
   document.getElementById('productsGrid').innerHTML = html;
 
