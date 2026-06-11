@@ -2,6 +2,7 @@
 
 var profile = {name:'', breed:'', age:'성견', size:'소형견', activity:'보통', health:[], bcs:'', weight:''};
 var currentFilter = 'all';
+var currentView = 'all';   // 'recommend' | 'all' — 초기값은 init에서 결정
 
 /* ── 보안 유틸 ── */
 // XSS 방지: innerHTML에 들어가는 모든 동적 문자열은 반드시 이스케이프
@@ -27,18 +28,25 @@ function storeUrl(path) {
   } catch (e) { return ''; }
 }
 
-/* ── 매칭 ── */
-function isMatched(p) {
+/* ── 추천 점수 ── */
+// 연령·견종 크기 적합 여부
+function fitsAgeSize(p) {
   var ageMap = {'자견':1,'성견':2,'노령견':3};
   var ageVal = ageMap[profile.age]||2;
   var sizeMap = {'소형견':2,'중대형견':3,'모든견종':4};
   var sizeVal = sizeMap[profile.size]||2;
   var ageOk = p.age.indexOf(4)>-1 || p.age.indexOf(ageVal)>-1;
   var sizeOk = p.size.indexOf(4)>-1 || p.size.indexOf(sizeVal)>-1;
-  var healthOk = profile.health.length===0 || profile.health.some(function(h){
-    return p.functions.some(function(f){return f.indexOf(h)>-1||h.indexOf(f)>-1;});
-  });
-  return ageOk && sizeOk && healthOk;
+  return ageOk && sizeOk;
+}
+// 추천 점수: 연령·크기 맞고, 건강 특이사항을 해결할수록 높음 (0이면 추천 아님)
+function recScore(p) {
+  if (profile.health.length === 0) return 0;
+  if (!fitsAgeSize(p)) return 0;
+  return profile.health.reduce(function(acc, h){
+    var hit = p.functions.some(function(f){ return f.indexOf(h)>-1 || h.indexOf(f)>-1; });
+    return acc + (hit ? 1 : 0);
+  }, 0);
 }
 
 function makeSpec(labels, pct, isPowder) {
@@ -71,55 +79,87 @@ function filterMatch(p, f) {
   return p.functions.some(function(fn){ return keys.some(function(k){return fn.indexOf(k)>-1||k.indexOf(fn)>-1;}); });
 }
 
+/* ── 카드 1개 HTML ── */
+function cardHTML(p, isRec, show) {
+  var texPct = p.texture==='분말' ? 0 : pct(p.texVal,1,3);
+  var agePct = p.age.indexOf(4)>-1 ? 100 : pct(Math.max.apply(null,p.age),1,4);
+  var sizePct = p.size.indexOf(4)>-1 ? 100 : pct(Math.max.apply(null,p.size),1,4);
+  var isPowder = p.texture==='분말';
+  var hlFns = p.functions.slice(0,3).map(function(f){
+    var isHL = profile.health.length>0 && profile.health.some(function(h){return f.indexOf(h)>-1||h.indexOf(f)>-1;});
+    return '<span class="tag-chip'+(isHL?' highlight':'')+'">'+escapeHtml(f)+'</span>';
+  }).join('');
+  var link = storeUrl(p.url);
+  var footerHTML = link
+    ? '<div class="card-footer"><a class="card-link" href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">자사몰에서 보기 →</a></div>'
+    : '';
+  return '<div class="product-card'+(isRec?' matched':'')+(show?'':' hidden')+'">' +
+    '<div class="card-img" style="background-color:'+safeColor(p.color)+';">' +
+      '<span>'+p.emoji+'</span>' +
+      (isRec?'<div class="match-badge">✦ 추천</div>':'')+
+      '<span class="cat-badge cat-'+escapeHtml(p.cat)+'">'+escapeHtml(p.catLabel)+'</span>'+
+    '</div>'+
+    '<div class="card-body">'+
+      '<div class="card-name">'+escapeHtml(p.name)+'</div>'+
+      '<div class="card-weight">'+escapeHtml(p.weight)+'</div>'+
+      '<div class="specs">'+
+        (isPowder
+          ? '<div class="spec-row"><div class="spec-labels"><span>분말형 제품</span></div><div class="spec-track"><div class="spec-dot powder" style="left:0%;top:50%;transform:translate(-50%,-50%);position:relative;display:inline-block;margin-left:2px;"></div></div></div>'
+          : makeSpec(['SOFT','MIDDLE','HARD'], texPct, false)
+        )+
+        makeSpec(['자견','성견','노령견','전연령'], agePct, false)+
+        makeSpec(['초소형','소형견','중대형','모든견종'], sizePct, false)+
+      '</div>'+
+      '<div class="tag-row">'+hlFns+'</div>'+
+      footerHTML+
+    '</div>'+
+  '</div>';
+}
+
 /* ── 렌더 ── */
 function renderCards() {
-  var grid = document.getElementById('productsGrid');
-  var matched = 0, visible = 0;
-  grid.innerHTML = PRODUCTS.map(function(p){
-    var isMatch = isMatched(p);
-    if(isMatch) matched++;
-    var show = filterMatch(p, currentFilter);
-    if(show) visible++;
-    var texPct = p.texture==='분말' ? 0 : pct(p.texVal,1,3);
-    var agePct = p.age.indexOf(4)>-1 ? 100 : pct(Math.max.apply(null,p.age),1,4);
-    var sizePct = p.size.indexOf(4)>-1 ? 100 : pct(Math.max.apply(null,p.size),1,4);
-    var isPowder = p.texture==='분말';
-    var hlFns = p.functions.slice(0,3).map(function(f){
-      var isHL = profile.health.length>0 && profile.health.some(function(h){return f.indexOf(h)>-1||h.indexOf(f)>-1;});
-      return '<span class="tag-chip'+(isHL?' highlight':'')+'">'+escapeHtml(f)+'</span>';
-    }).join('');
-    // 자사몰 바로가기 — url이 유효한(자사몰 도메인) 경우에만 노출
-    var link = storeUrl(p.url);
-    var footerHTML = link
-      ? '<div class="card-footer"><a class="card-link" href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">자사몰에서 보기 →</a></div>'
-      : '';
-    return '<div class="product-card'+(isMatch?' matched':'')+(show?'':' hidden')+'">' +
-      '<div class="card-img" style="background-color:'+safeColor(p.color)+';">' +
-        '<span>'+p.emoji+'</span>' +
-        (isMatch?'<div class="match-badge">✦ 추천</div>':'')+
-        '<span class="cat-badge cat-'+escapeHtml(p.cat)+'">'+escapeHtml(p.catLabel)+'</span>'+
-      '</div>'+
-      '<div class="card-body">'+
-        '<div class="card-name">'+escapeHtml(p.name)+'</div>'+
-        '<div class="card-weight">'+escapeHtml(p.weight)+'</div>'+
-        '<div class="specs">'+
-          (isPowder
-            ? '<div class="spec-row"><div class="spec-labels"><span>분말형 제품</span></div><div class="spec-track"><div class="spec-dot powder" style="left:0%;top:50%;transform:translate(-50%,-50%);position:relative;display:inline-block;margin-left:2px;"></div></div></div>'
-            : makeSpec(['SOFT','MIDDLE','HARD'], texPct, false)
-          )+
-          makeSpec(['자견','성견','노령견','전연령'], agePct, false)+
-          makeSpec(['초소형','소형견','중대형','모든견종'], sizePct, false)+
-        '</div>'+
-        '<div class="tag-row">'+hlFns+'</div>'+
-        footerHTML+
-      '</div>'+
-    '</div>';
+  // 추천 점수 부여 + 추천 우선 정렬(동점은 원래 순서 유지 — 안정 정렬)
+  var list = PRODUCTS.map(function(p, i){
+    var s = recScore(p);
+    return { p:p, score:s, rec:s>0, idx:i };
+  });
+  var recCount = list.filter(function(x){ return x.rec; }).length;
+  list.sort(function(a, b){ return (b.score - a.score) || (a.idx - b.idx); });
+
+  var visible = 0;
+  var html = list.map(function(x){
+    var inView = (currentView === 'all') || x.rec;
+    var show = inView && filterMatch(x.p, currentFilter);
+    if (show) visible++;
+    return cardHTML(x.p, x.rec, show);
   }).join('');
-  document.getElementById('filterCount').textContent = visible+'개 제품';
-  var banner = document.getElementById('matchBanner');
-  if(matched>0 && profile.health.length>0){ document.getElementById('matchCount').textContent=matched; banner.classList.add('show'); }
-  else banner.classList.remove('show');
-  document.getElementById('emptyState').style.display = visible===0?'block':'none';
+  document.getElementById('productsGrid').innerHTML = html;
+
+  // 탭 카운트
+  document.getElementById('recTabCount').textContent = recCount;
+  document.getElementById('allTabCount').textContent = PRODUCTS.length;
+  document.getElementById('filterCount').textContent = visible + '개 제품';
+
+  // 빈 상태(맥락별 메시지)
+  var empty = document.getElementById('emptyState');
+  if (visible === 0) {
+    empty.style.display = 'block';
+    empty.querySelector('p').textContent =
+      (currentView === 'recommend' && recCount === 0)
+        ? '건강 특이사항을 입력하면 맞춤 추천을 보여드려요'
+        : '조건에 맞는 제품이 없습니다';
+  } else {
+    empty.style.display = 'none';
+  }
+}
+
+/* ── 탭/필터 ── */
+function setView(v, el) {
+  currentView = v;
+  currentFilter = 'all';
+  document.querySelectorAll('.view-tab').forEach(function(b){ b.classList.toggle('active', b===el); });
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.filter==='all'); });
+  renderCards();
 }
 
 function setFilter(val, el) {
@@ -182,7 +222,20 @@ function updatePersonaBar() {
   if(profile.breed) document.getElementById('heroDesc').textContent = profile.breed+' · '+profile.age+' 기준으로 맞춤 추천해 드립니다.';
 }
 
+/* ── 초기 뷰 결정: 추천할 게 있으면 '맞춤 추천' 탭으로 시작 ── */
+function initView() {
+  var hasRec = PRODUCTS.some(function(p){ return recScore(p) > 0; });
+  currentView = hasRec ? 'recommend' : 'all';
+  document.querySelectorAll('.view-tab').forEach(function(b){
+    b.classList.toggle('active', b.dataset.view === currentView);
+  });
+}
+
 /* ── 이벤트 바인딩 (inline 핸들러 제거 — CSP 대응) ── */
+document.querySelector('.view-tabs').addEventListener('click', function(e){
+  var tab = e.target.closest('.view-tab');
+  if (tab && tab.dataset.view) setView(tab.dataset.view, tab);
+});
 document.querySelector('.filter-wrap').addEventListener('click', function(e){
   var btn = e.target.closest('.filter-btn');
   if (btn && btn.dataset.filter) setFilter(btn.dataset.filter, btn);
@@ -190,13 +243,8 @@ document.querySelector('.filter-wrap').addEventListener('click', function(e){
 document.querySelectorAll('.back-btn, .persona-edit').forEach(function(el){
   el.addEventListener('click', function(){ window.location.href = 'index.html'; });
 });
-var bannerClose = document.querySelector('.match-banner-close');
-if (bannerClose) {
-  bannerClose.addEventListener('click', function(){
-    document.getElementById('matchBanner').classList.remove('show');
-  });
-}
 
 parseParams();
 updatePersonaBar();
+initView();
 renderCards();
