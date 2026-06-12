@@ -3,31 +3,29 @@
 html { scroll-behavior: smooth; }
 body {
   font-family: 'Noto Sans KR', sans-serif; color: var(--text); min-height: 100vh; line-height: 1.6;
-  background: radial-gradient(1100px 480px at 50% -120px, #F2EBDD 0%, var(--bg) 65%) fixed, var(--bg);
+  background: radial-gradient(1100px 480px at 50% -120px, #EFE6DC 0%, var(--bg) 65%) fixed, var(--bg);
   -webkit-font-smoothing: antialiased;
 }
 :focus-visible { outline: none; box-shadow: var(--ring); border-radius: 8px; }
 
-/* ── Header (자사몰과 동일한 라이트 헤더 + 브랜드 로고) ── */
-.header {
-  background: rgba(255,255,255,.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  padding: 0 22px; height: 64px;
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 100;
+/* ── App card (가운데 떠 있는 카드 안에 계산기) ── */
+.container {
+  max-width: 560px; margin: 30px auto; padding: 22px 26px 24px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow-md);
 }
-.header::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
-  background: linear-gradient(90deg, var(--green) 0%, var(--green-mid) 45%, var(--olive) 100%);
-  opacity: .9;
+
+/* 카드 안 상단 헤더 (로고 + 태그라인) */
+.app-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 16px; margin-bottom: 18px; border-bottom: 1px solid var(--border);
 }
 .logo { display: flex; align-items: center; }
-.logo img { height: 24px; display: block; mix-blend-mode: multiply; }
-.header-sub { font-size: 11.5px; color: var(--text-light); letter-spacing: .14em; text-transform: uppercase; }
-
-.container { max-width: 580px; margin: 0 auto; padding: 26px 18px 64px; }
+.logo img { height: 22px; display: block; mix-blend-mode: multiply; }
+.app-tagline { font-size: 11.5px; color: var(--text-light); letter-spacing: .03em; }
 
 /* ── Progress ── */
-.progress-wrap { margin-bottom: 22px; padding: 0 4px; }
+.progress-wrap { margin-bottom: 20px; padding: 0; }
 .progress-steps { display: flex; align-items: center; margin-bottom: 10px; }
 .step-dot {
   width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border);
@@ -37,8 +35,8 @@ body {
 }
 .step-dot.active {
   border-color: transparent; color: #fff; transform: scale(1.1);
-  background: linear-gradient(135deg, #976B3F, var(--green-dark));
-  box-shadow: 0 5px 14px rgba(110,75,42,.32);
+  background: var(--green);
+  box-shadow: 0 5px 14px rgba(86,68,56,.32);
 }
 .step-dot.done { border-color: var(--green-mid); background: var(--green-light); color: var(--green-dark); font-size: 0; }
 .step-dot.done::after { content: '✓'; font-size: 13px; font-weight: 700; }
@@ -52,12 +50,9 @@ body {
 .progress-label { font-size: 12px; color: var(--text-light); letter-spacing: .02em; }
 .progress-label strong { color: var(--green-dark); font-weight: 600; }
 
-/* ── Step panel (card) ── */
-.step-panel {
-  display: none; background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 26px 22px 24px; box-shadow: var(--shadow-md);
-}
-.step-panel.active { display: block; animation: panelIn .4s var(--ease); }
+/* ── Step panel (카드 안 콘텐츠, 자체 카드 스타일 없음) ── */
+.step-panel { display: none; }
+.step-panel.active { display: block; animation: panelIn .85s var(--ease); }
 @keyframes panelIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
 .step-heading { margin-bottom: 20px; }
@@ -103,8 +98,8 @@ body {
 .breed-card.selected .breed-name { color: var(--green-dark); font-weight: 700; }
 .breed-size-tag { display: inline-block; font-size: 9px; padding: 2px 7px; border-radius: 99px; margin-top: 4px; font-weight: 600; letter-spacing: .02em; }
 .size-small  { background: var(--olive-light); color: var(--olive-dark); }
-.size-medium { background: var(--amber-light); color: #8a6306; }
-.size-large  { background: #E7EEF2; color: #4E6B82; }
+.size-medium { background: var(--amber-light); color: var(--amber-dark); }
+.size-large  { background: var(--terra-light); color: var(--terra-dark); }
 
 /* ── Form ── */
 .field { margin-bottom: 20px; }
@@ -179,8 +174,8 @@ input[type=range]::-moz-range-thumb {
 .tag:hover { border-color: var(--green-mid); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 .tag.selected {
   border-color: var(--green); color: #fff; font-weight: 500;
-  background: linear-gradient(135deg, #976B3F, var(--green-dark));
-  box-shadow: 0 4px 12px rgba(110,75,42,.25);
+  background: var(--green);
+  box-shadow: 0 4px 12px rgba(86,68,56,.25);
 }
 
 /* ── Ingredient grid (step 4) ── */
@@ -200,7 +195,7 @@ input[type=range]::-moz-range-thumb {
 .tip-recommend { background: var(--safe-light); color: var(--safe-dark); }
 .tip-caution { background: var(--amber-light); color: var(--amber-dark); }
 .tip-danger { background: var(--red-light); color: var(--red-dark); }
-.tip-info { background: #ECE7F2; color: #6A5890; }
+.tip-info { background: var(--green-light); color: var(--green-dark); }
 .ing-check {
   width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .18s var(--ease);
@@ -276,7 +271,7 @@ input[type=range]::-moz-range-thumb {
 .rec-badge { font-size: 11px; padding: 4px 11px; border-radius: 99px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
 .b-green { background: var(--safe-light); color: var(--safe-dark); }
 .b-amber { background: var(--amber-light); color: var(--amber-dark); }
-.b-purple { background: #ECE7F2; color: #6A5890; }
+.b-purple { background: var(--green-light); color: var(--green-dark); }
 
 .disclaimer {
   background: var(--cream); border: 1px dashed var(--sand-dark); border-radius: var(--radius-sm);
@@ -293,15 +288,15 @@ input[type=range]::-moz-range-thumb {
 .btn:hover { border-color: var(--sand-dark); background: var(--cream); }
 .btn:active { transform: scale(.97); }
 .btn.primary {
-  background: linear-gradient(135deg, #976B3F, var(--green-dark)); color: white; border: none;
-  box-shadow: 0 6px 18px rgba(110,75,42,.3);
+  background: var(--green); color: white; border: none;
+  box-shadow: 0 6px 18px rgba(86,68,56,.3);
 }
-.btn.primary:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(110,75,42,.38); filter: brightness(1.06); }
+.btn.primary:hover { transform: translateY(-1px); background: var(--green-dark); box-shadow: 0 10px 24px rgba(86,68,56,.38); }
 .btn.cta {
-  background: linear-gradient(135deg, #C17B42, var(--terra-dark)); color: white; border: none;
-  box-shadow: 0 6px 18px rgba(143,85,38,.32);
+  background: var(--terra); color: var(--bark); border: none; font-weight: 700;
+  box-shadow: 0 6px 18px rgba(206,141,113,.4);
 }
-.btn.cta:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(143,85,38,.4); filter: brightness(1.06); }
+.btn.cta:hover { transform: translateY(-1px); background: var(--terra-dark); box-shadow: 0 10px 24px rgba(206,141,113,.5); }
 
 /* ── BCS ── */
 .bcs-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; margin-bottom: 10px; }
@@ -331,8 +326,7 @@ input[type=range]::-moz-range-thumb {
 
 /* ── Responsive / Motion ── */
 @media (max-width: 430px) {
-  .container { padding: 20px 14px 56px; }
-  .step-panel { padding: 22px 16px 20px; border-radius: 18px; }
+  .container { margin: 14px auto; padding: 18px 16px 20px; border-radius: 18px; }
   .step-heading h1 { font-size: 21px; }
   .bcs-grid { gap: 5px; }
   .bcs-card { padding: 10px 3px 8px; }
