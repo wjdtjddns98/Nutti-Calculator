@@ -95,6 +95,18 @@ function escapeHtml(s) {
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
   });
 }
+// 자사몰 바로가기: nutti.co.kr 도메인만 허용 + UTM 부착. 그 외엔 빈 문자열(미노출)
+var STORE_ORIGIN = 'https://nutti.co.kr';
+function storeUrl(path) {
+  if (!path) return '';
+  try {
+    var u = new URL(path, STORE_ORIGIN);
+    if (u.origin !== STORE_ORIGIN) return '';
+    u.searchParams.set('utm_source', 'treat-calculator');
+    u.searchParams.set('utm_medium', 'referral');
+    return u.href;
+  } catch (e) { return ''; }
+}
 // 강아지 이름: 공백 정리 + 20자 제한, 비면 기본값
 function getDogNameRaw() {
   var v = (document.getElementById('dogName').value || '').trim().slice(0, 20);
@@ -348,27 +360,27 @@ function renderResult() {
     ? '<div class="alert amber"><span class="alert-icon">⚠️</span><span>주의 성분이 있습니다. 소량만 급여하고 반응을 지켜보세요.</span></div>'
     : '<div class="alert green"><span class="alert-icon">✅</span><span>선택하신 성분은 모두 안전합니다.</span></div>';
 
-  /* 상품 추천 — 건강 상태 연동 (가격 정보는 보안·정책상 노출하지 않음) */
+  /* 상품 추천 — nutti.co.kr 실판매 품목과 1:1 매칭 (가격 정보는 보안·정책상 노출하지 않음) */
   var ALL_RECS = [
     // 관절
-    {name:'상어연골', desc:'콘드로이틴·칼슘 고함유 — 관절염·뼈건강에 집중', badge:'관절 맞춤', bc:'b-purple', cond:'관절'},
-    {name:'오메가 MSM + 연어분말(통)', desc:'오메가3+MSM 관절 케어 기능성 분말', badge:'관절 맞춤', bc:'b-purple', cond:'관절'},
+    {name:'말랑 튼튼 송아지 연골 천연 껌', desc:'천연 송아지 연골 — 관절·뼈 건강 케어', badge:'관절 맞춤', bc:'b-purple', cond:'관절', url:'/product/말랑-튼튼-송아지-연골-천연-껌/57/'},
+    {name:'쫀득한 콜라겐 미니 하프족', desc:'콜라겐 가득 — 관절·피부 동시 케어', badge:'관절 맞춤', bc:'b-purple', cond:'관절', url:'/product/쫀득한-콜라겐-미니-하프족/63/'},
     // 피부
-    {name:'리얼 오리져키', desc:'필수지방산·아미노산 — 알러지 예방·피부 건강', badge:'피부 맞춤', bc:'b-purple', cond:'피부'},
-    {name:'연어분말 팩', desc:'오메가3·비타민D — 피부 윤기·모질 개선', badge:'피부 맞춤', bc:'b-purple', cond:'피부'},
+    {name:'프레시 그린 연어 야채 트릿', desc:'연어 오메가3 — 피부 장벽·모질 개선', badge:'피부 맞춤', bc:'b-purple', cond:'피부', url:'/product/프레시-그린-연어-야채-트릿/76/'},
+    {name:'노즈워크 한입 쏙 연어 삼색트릿', desc:'연어·단호박·자색고구마 — 피부·항산화', badge:'피부 맞춤', bc:'b-purple', cond:'피부', url:'/product/노즈워크-한입-쏙-연어-삼색트릿/75/'},
     // 다이어트
-    {name:'황태 츄러스 SOFT', desc:'고단백 저지방 — 다이어트 중인 강아지 최적', badge:'다이어트 맞춤', bc:'b-purple', cond:'다이어트'},
-    {name:'저온건조 당근(통)', desc:'베타카로틴·초저칼로리 — 죄책감 없는 간식', badge:'다이어트 맞춤', bc:'b-purple', cond:'다이어트'},
+    {name:'껍질째 통째로, 바삭한 완두콩칩', desc:'식물성 단백질·식이섬유 — 저지방 비건 칩', badge:'다이어트 맞춤', bc:'b-purple', cond:'다이어트', url:'/product/껍질째-통째로-바삭한-완두콩칩/70/'},
+    {name:'달콤한 자연 한 입 당근', desc:'저칼로리 자연 간식 — 죄책감 없는 한 입', badge:'다이어트 맞춤', bc:'b-purple', cond:'다이어트', url:'/product/달콤한-자연-한-입-당근/69/'},
     // 소화
-    {name:'연어당근 SOFT (몽땅)', desc:'오메가3+섬유질 — 소화 촉진·변비 개선', badge:'소화 맞춤', bc:'b-purple', cond:'소화'},
-    {name:'단호박 츄러스 SOFT', desc:'베타카로틴·무기질 — 소화·면역력 동시', badge:'소화 맞춤', bc:'b-purple', cond:'소화'},
-    // 빈혈·기력
-    {name:'소허파', desc:'철분·비타민 고함유 — 빈혈·기력 회복', badge:'기력 맞춤', bc:'b-purple', cond:'빈혈'},
-    {name:'소간', desc:'철분·비타민 — 빈혈·눈건강·피부 케어', badge:'기력 맞춤', bc:'b-purple', cond:'빈혈'},
+    {name:'햇살 가득 아삭 연근칩', desc:'식이섬유 — 소화·장 건강에 도움', badge:'소화 맞춤', bc:'b-purple', cond:'소화', url:'/product/햇살-가득-아삭-연근칩/68/'},
+    {name:'노랗게 잘 익은 달콤 단호박칩', desc:'펙틴·식이섬유 — 소화·눈 건강 동시', badge:'소화 맞춤', bc:'b-purple', cond:'소화', url:'/product/노랗게-잘-익은-달콤-단호박칩/73/'},
+    // 치아
+    {name:'든든한 하루 한 대, 카우스틱', desc:'하루 한 대 오래 씹는 껌 — 치석 관리', badge:'치아 맞춤', bc:'b-purple', cond:'치아', url:'/product/든든한-하루-한-대-카우스틱/54/'},
+    {name:'통째로 말려 더 고소한 돼지 통 귀', desc:'통째로 말린 츄 — 치아·잇몸 단련', badge:'치아 맞춤', bc:'b-purple', cond:'치아', url:'/product/통째로-말려-더-고소한-돼지-통-귀/80/'},
     // 기본 추천 (조건 없을 때)
-    {name:'훈련용 노즈워크 연단고', desc:'소프트 질감 — 훈련 포상·노즈워크 전용', badge:'인기', bc:'b-green', cond:null},
-    {name:'소창개껌스틱 20g', desc:'철분·비타민·필수지방산 — 전연령 모든 견종', badge:'추천', bc:'b-green', cond:null},
-    {name:'황태포', desc:'필수아미노산·고단백 저지방 — 전연령 기호성 높음', badge:'추천', bc:'b-green', cond:null},
+    {name:'든든한 하루 한 대, 카우스틱', desc:'즐겁게 오래 씹는 데일리 영양 껌', badge:'인기', bc:'b-green', cond:null, url:'/product/든든한-하루-한-대-카우스틱/54/'},
+    {name:'노즈워크 한입 쏙 연어 삼색트릿', desc:'한입 쏙 말랑 트릿 — 훈련 보상·노즈워크', badge:'추천', bc:'b-green', cond:null, url:'/product/노즈워크-한입-쏙-연어-삼색트릿/75/'},
+    {name:'노랗게 잘 익은 달콤 단호박칩', desc:'단호박 100% 바삭 칩 — 전연령 기호성 높음', badge:'추천', bc:'b-green', cond:null, url:'/product/노랗게-잘-익은-달콤-단호박칩/73/'},
   ];
 
   // 건강 상태 매칭 추천 3개 선택
@@ -436,7 +448,11 @@ function renderResult() {
     '<div class="divider"></div>' +
     '<div class="section-title">'+nameSafe+'에게 맞는 누띠 추천</div>' +
     recs.map(function(r){
-      return '<div class="rec-item"><div><div class="rec-item-name">'+escapeHtml(r.name)+'</div><div class="rec-item-desc">'+escapeHtml(r.desc)+'</div></div><span class="rec-badge '+r.bc+'">'+escapeHtml(r.badge)+'</span></div>';
+      var inner = '<div><div class="rec-item-name">'+escapeHtml(r.name)+'</div><div class="rec-item-desc">'+escapeHtml(r.desc)+' · 자사몰에서 보기 →</div></div><span class="rec-badge '+r.bc+'">'+escapeHtml(r.badge)+'</span>';
+      var link = storeUrl(r.url);
+      return link
+        ? '<a class="rec-item" href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>'
+        : '<div class="rec-item">'+inner+'</div>';
     }).join('') +
 
     '<div class="disclaimer"><span style="flex-shrink:0;">ℹ️</span><span>본 결과는 수의영양학 공식(RER = 70 × 체중^0.75) 기반 참고값입니다. 정확한 급여량은 담당 수의사와 상담하세요.</span></div>';
