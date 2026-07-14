@@ -448,7 +448,7 @@ function renderResult() {
     '<div class="divider"></div>' +
     '<div class="section-title">'+nameSafe+'에게 맞는 누띠 추천</div>' +
     recs.map(function(r){
-      var inner = '<div><div class="rec-item-name">'+escapeHtml(r.name)+'</div><div class="rec-item-desc">'+escapeHtml(r.desc)+' · 자사몰에서 보기 →</div></div><span class="rec-badge '+r.bc+'">'+escapeHtml(r.badge)+'</span>';
+      var inner = '<div><div class="rec-item-name">'+escapeHtml(r.name)+'</div><div class="rec-item-desc">'+escapeHtml(r.desc)+' · 자사몰에서 보러가기 →</div></div><span class="rec-badge '+r.bc+'">'+escapeHtml(r.badge)+'</span>';
       var link = storeUrl(r.url);
       return link
         ? '<a class="rec-item" href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>'
