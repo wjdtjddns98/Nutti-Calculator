@@ -510,6 +510,14 @@ function goToProducts() {
 
 /* ── 이벤트 바인딩 (inline 핸들러 제거 — CSP 대응) ── */
 document.addEventListener('click', function(e){
+  // 누띠 바로가기 클릭 추적 (GA4 — ga.js에 측정 ID 설정 시에만 동작, 링크 이동은 그대로 진행)
+  var store = e.target.closest('a.rec-item');
+  if (store && window.gtag) {
+    gtag('event', 'store_click', {
+      product_name: (store.querySelector('.rec-item-name')||{}).textContent || '',
+      page: 'result'
+    });
+  }
   // 단계 이동 버튼
   var nav = e.target.closest('[data-goto]');
   if (nav) { goStep(parseInt(nav.dataset.goto, 10)); return; }
