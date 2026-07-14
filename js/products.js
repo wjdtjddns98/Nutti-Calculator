@@ -94,7 +94,7 @@ function cardHTML(p, isRec, show, concerns) {
   }).join('');
   var link = storeUrl(p.url);
   var footerHTML = link
-    ? '<div class="card-footer"><a class="card-link" href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">자사몰에서 보러가기 →</a></div>'
+    ? '<div class="card-footer"><a class="card-link" href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">누띠에서 보러가기 →</a></div>'
     : '';
   // 추천 이유 배지: 강아지 고민 중 이 제품이 맞는 항목(최대 2개)
   var reason = (concerns && concerns.length)
