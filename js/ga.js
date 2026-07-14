@@ -6,7 +6,7 @@
      (유튜브/댓글 등에 뿌릴 땐 링크에 utm_source를 붙일 것)
    - 바로가기 클릭은 'store_click' 이벤트로 수집된다.
    ───────────────────────────────────────────── */
-var GA_ID = '';  // 예: 'G-XXXXXXXXXX'
+var GA_ID = 'G-KG0XE6F5XT';
 
 if (GA_ID) {
   var gaScript = document.createElement('script');
