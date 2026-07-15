@@ -102,8 +102,8 @@ button,.card-link{touch-action:manipulation;}
 
 /* 자사몰 바로가기 (url 있는 상품에만 렌더) */
 .card-footer{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
-.card-link{display:flex;align-items:center;justify-content:center;gap:6px;height:42px;border-radius:99px;background:var(--terra);color:var(--bark);font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 12px rgba(206,141,113,.35);transition:all .18s var(--ease);}
-.card-link:hover{transform:translateY(-1px);background:var(--terra-dark);box-shadow:0 8px 18px rgba(206,141,113,.45);}
+.card-link{display:flex;align-items:center;justify-content:center;gap:6px;height:42px;border-radius:99px;background:var(--terra);color:#fff;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 12px rgba(176,92,56,.30);transition:all .18s var(--ease);}
+.card-link:hover{transform:translateY(-1px);background:var(--terra-dark);box-shadow:0 8px 18px rgba(176,92,56,.40);}
 
 /* ── Empty / Footer ── */
 .empty{text-align:center;padding:70px 20px;color:var(--text-light);}

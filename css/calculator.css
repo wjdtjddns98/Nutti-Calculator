@@ -299,10 +299,10 @@ a.rec-item { text-decoration: none; color: inherit; cursor: pointer; }
 }
 .btn.primary:hover { transform: translateY(-1px); background: var(--green-dark); box-shadow: 0 10px 24px rgba(86,68,56,.38); }
 .btn.cta {
-  background: var(--terra); color: var(--bark); border: none; font-weight: 700;
-  box-shadow: 0 6px 18px rgba(206,141,113,.4);
+  background: var(--terra); color: #fff; border: none; font-weight: 700;
+  box-shadow: 0 6px 18px rgba(176,92,56,.35);
 }
-.btn.cta:hover { transform: translateY(-1px); background: var(--terra-dark); box-shadow: 0 10px 24px rgba(206,141,113,.5); }
+.btn.cta:hover { transform: translateY(-1px); background: var(--terra-dark); box-shadow: 0 10px 24px rgba(176,92,56,.45); }
 
 /* ── BCS ── */
 .bcs-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; margin-bottom: 10px; }
