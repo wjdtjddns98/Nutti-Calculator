@@ -147,3 +147,8 @@ button,.card-link{touch-action:manipulation;}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important;}
 }
+/* 터치 기기에서 최소 44px 터치 타깃 (WCAG 2.5.8) — 시각 크기는 유지, 히트 영역만 확장 */
+@media (pointer:coarse){
+  .filter-btn,.back-btn,.persona-edit{min-height:44px;}
+  .card-link{min-height:44px;height:auto;}
+}
