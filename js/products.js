@@ -167,7 +167,10 @@ function renderCards() {
 function setView(v, el) {
   currentView = v;
   currentFilter = 'all';
-  document.querySelectorAll('.view-tab').forEach(function(b){ b.classList.toggle('active', b===el); });
+  document.querySelectorAll('.view-tab').forEach(function(b){
+    b.classList.toggle('active', b===el);
+    b.setAttribute('aria-selected', b===el ? 'true' : 'false');
+  });
   document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.filter==='all'); });
   renderCards();
 }
@@ -237,7 +240,9 @@ function initView() {
   var hasRec = PRODUCTS.some(function(p){ return recScore(p) > 0; });
   currentView = hasRec ? 'recommend' : 'all';
   document.querySelectorAll('.view-tab').forEach(function(b){
-    b.classList.toggle('active', b.dataset.view === currentView);
+    var on = b.dataset.view === currentView;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
   });
 }
 

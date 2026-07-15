@@ -28,7 +28,8 @@
   --sky: #5E7A8F; --sky-light: #E9EEF1;
   --purple: #8A7E9E; --purple-light: #EEEAF2;
   /* 텍스트·서피스 */
-  --text: #332E2A; --text-muted: #6E635A; --text-light: #A89E94;
+  /* text-light: 소형 라벨에도 WCAG 4.5:1 근접하도록 #A89E94 → #857567 로 다크닝 */
+  --text: #332E2A; --text-muted: #6E635A; --text-light: #857567;
   --bg: #F5EFEB; --surface: #ffffff; --border: #E7DFD4; --border-hover: #CFC3B3;
   /* 형태·모션 */
   --radius: 20px; --radius-sm: 14px;
