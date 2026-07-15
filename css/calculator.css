@@ -200,7 +200,8 @@ input[type=range]::-moz-range-thumb {
 .ing-tip { font-size: 11px; padding: 3px 9px; border-radius: 99px; font-weight: 600; white-space: nowrap; }
 .tip-recommend { background: var(--safe-light); color: var(--safe-dark); }
 .tip-caution { background: var(--amber-light); color: var(--amber-dark); }
-.tip-danger { background: var(--red-light); color: var(--red-dark); }
+/* 위험(독성) 배지는 솔리드 반전 — 주의(파스텔)와 한눈에 구분 */
+.tip-danger { background: var(--red-dark); color: var(--red-light); }
 .tip-info { background: var(--green-light); color: var(--green-dark); }
 .ing-check {
   width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border);
@@ -264,7 +265,7 @@ input[type=range]::-moz-range-thumb {
 .ing-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
 .badge-safe { background: var(--safe-light); color: var(--safe-dark); }
 .badge-warn { background: var(--amber-light); color: var(--amber-dark); }
-.badge-danger { background: var(--red-light); color: var(--red-dark); }
+.badge-danger { background: var(--red-dark); color: var(--red-light); }
 
 .rec-item {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
