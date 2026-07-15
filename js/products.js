@@ -153,11 +153,12 @@ function renderCards() {
   // 빈 상태(맥락별 메시지)
   var empty = document.getElementById('emptyState');
   if (visible === 0) {
+    var needsPersona = (currentView === 'recommend' && recCount === 0);
     empty.style.display = 'block';
-    empty.querySelector('p').textContent =
-      (currentView === 'recommend' && recCount === 0)
-        ? '건강 특이사항을 입력하면 맞춤 추천을 보여드려요'
-        : '조건에 맞는 제품이 없습니다';
+    empty.querySelector('p').textContent = needsPersona
+      ? '건강 특이사항을 입력하면 맞춤 추천을 보여드려요'
+      : '조건에 맞는 제품이 없습니다';
+    document.getElementById('emptyCta').style.display = needsPersona ? 'inline-flex' : 'none';
   } else {
     empty.style.display = 'none';
   }
