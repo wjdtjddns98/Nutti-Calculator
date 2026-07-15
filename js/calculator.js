@@ -456,7 +456,7 @@ function renderResult() {
         : '<div class="rec-item">'+inner+'</div>';
     }).join('') +
 
-    '<div class="disclaimer"><span style="flex-shrink:0;">ℹ️</span><span>본 결과는 수의영양학 공식(RER = 70 × 체중^0.75) 기반 참고값입니다. 정확한 급여량은 담당 수의사와 상담하세요.</span></div>';
+    '<div class="disclaimer"><span style="flex-shrink:0;">🩺</span><span>본 결과는 수의영양학 공식(RER = 70 × 체중^0.75) 기반 참고값입니다. 정확한 급여량은 담당 수의사와 상담하세요.</span></div>';
 
   setTimeout(function(){
     var el = document.getElementById('accFill');
