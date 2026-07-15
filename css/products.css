@@ -1,6 +1,6 @@
 /* 디자인 토큰(:root)은 css/theme.css 에서 로드 — 이 파일보다 먼저 link 필요 */
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:break-word;}
 :focus-visible{outline:none;box-shadow:var(--ring);border-radius:8px;}
 /* 모바일 탭 300ms 지연 제거 */
 button,.card-link{touch-action:manipulation;}

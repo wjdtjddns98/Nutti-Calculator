@@ -5,6 +5,7 @@ body {
   font-family: 'Noto Sans KR', sans-serif; color: var(--text); min-height: 100vh; line-height: 1.6;
   background: radial-gradient(1100px 480px at 50% -120px, #EFE6DC 0%, var(--bg) 65%) fixed, var(--bg);
   -webkit-font-smoothing: antialiased;
+  word-break: keep-all; overflow-wrap: break-word;
 }
 :focus-visible { outline: none; box-shadow: var(--ring); border-radius: 8px; }
 /* 모바일 탭 300ms 지연 제거 + 카드류 더블탭 확대 방지 */
