@@ -449,7 +449,7 @@ function renderResult() {
     '<div class="divider"></div>' +
     '<div class="section-title">'+nameSafe+'에게 맞는 누띠 추천</div>' +
     recs.map(function(r){
-      var inner = '<div><div class="rec-item-name">'+escapeHtml(r.name)+'</div><div class="rec-item-desc">'+escapeHtml(r.desc)+' · 누띠에서 보러가기 →</div></div><span class="rec-badge '+r.bc+'">'+escapeHtml(r.badge)+'</span>';
+      var inner = '<div class="rec-item-body"><div class="rec-item-top"><div class="rec-item-name">'+escapeHtml(r.name)+'</div><span class="rec-badge '+r.bc+'">'+escapeHtml(r.badge)+'</span></div><div class="rec-item-desc">'+escapeHtml(r.desc)+'</div></div><div class="rec-item-cta">누띠에서 보러가기 →</div>';
       var link = storeUrl(r.url);
       return link
         ? '<a class="rec-item" href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>'
@@ -462,6 +462,15 @@ function renderResult() {
     var el = document.getElementById('accFill');
     if(el) el.style.width = accuracy+'%';
   }, 100);
+
+  // 카드마다 이름/설명 길이가 달라도 구분선·CTA를 같은 y좌표에 맞추기 위해
+  // 가장 큰 카드 높이를 나머지 카드에 맞춤 (rec-item-body가 flex:1로 여백 흡수)
+  var recCards = document.querySelectorAll('.rec-item');
+  if (recCards.length > 1) {
+    var maxH = 0;
+    recCards.forEach(function(c){ c.style.minHeight = ''; maxH = Math.max(maxH, c.offsetHeight); });
+    recCards.forEach(function(c){ c.style.minHeight = maxH + 'px'; });
+  }
 
   // 결과 숫자 카운트업 애니메이션
   var numEl = document.getElementById('resultNum');

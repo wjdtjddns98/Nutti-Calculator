@@ -109,18 +109,20 @@ function cardHTML(p, isRec, show, concerns) {
       '<span class="cat-badge cat-'+escapeHtml(p.cat)+'">'+escapeHtml(p.catLabel)+'</span>'+
     '</div>'+
     '<div class="card-body">'+
-      reasonHTML+
-      '<div class="card-name">'+escapeHtml(p.name)+'</div>'+
-      '<div class="card-weight">'+escapeHtml(p.weight)+'</div>'+
-      '<div class="specs">'+
-        (isPowder
-          ? '<div class="spec-row"><div class="spec-labels"><span>분말형 제품</span></div><div class="spec-track"><div class="spec-dot powder" style="left:0%;top:50%;transform:translate(-50%,-50%);position:relative;display:inline-block;margin-left:2px;"></div></div></div>'
-          : makeSpec(['SOFT','MIDDLE','HARD'], texPct, false)
-        )+
-        makeSpec(['자견','성견','노령견','전연령'], agePct, false)+
-        makeSpec(['초소형','소형견','중대형','모든견종'], sizePct, false)+
+      '<div class="card-content">'+
+        reasonHTML+
+        '<div class="card-name">'+escapeHtml(p.name)+'</div>'+
+        '<div class="card-weight">'+escapeHtml(p.weight)+'</div>'+
+        '<div class="specs">'+
+          (isPowder
+            ? '<div class="spec-row"><div class="spec-labels"><span>분말형 제품</span></div><div class="spec-track"><div class="spec-dot powder" style="left:0%;top:50%;transform:translate(-50%,-50%);position:relative;display:inline-block;margin-left:2px;"></div></div></div>'
+            : makeSpec(['SOFT','MIDDLE','HARD'], texPct, false)
+          )+
+          makeSpec(['자견','성견','노령견','전연령'], agePct, false)+
+          makeSpec(['초소형','소형견','중대형','모든견종'], sizePct, false)+
+        '</div>'+
+        '<div class="tag-row">'+hlFns+'</div>'+
       '</div>'+
-      '<div class="tag-row">'+hlFns+'</div>'+
       footerHTML+
     '</div>'+
   '</div>';
