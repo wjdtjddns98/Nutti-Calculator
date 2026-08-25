@@ -341,6 +341,28 @@ a.rec-item { text-decoration: none; color: inherit; cursor: pointer; }
 .site-footer { text-align: center; padding: 38px 20px 30px; font-size: 11.5px; color: var(--text-light); letter-spacing: .08em; line-height: 1.9; }
 .footer-logo { height: 17px; width: auto; display: block; margin: 0 auto 8px; mix-blend-mode: multiply; opacity: .85; }
 
+/* ── 첫 화면 뷰포트 맞춤 (STEP 1: 견종 선택) ──
+   1단계에서는 로고부터 푸터까지 스크롤 없이 한 화면에 들어오게 한다.
+   남는 높이/모자란 높이는 견종 그리드가 흡수하고(그리드만 내부 스크롤),
+   나머지 요소는 min-height:auto 라 콘텐츠 아래로 줄어들지 않는다.
+   dvh 가 아니라 svh — 모바일 주소창이 보이는 '가장 작은' 높이에 맞춰야
+   주소창 상태와 무관하게 푸터가 잘리지 않는다. */
+body.fit-screen {
+  min-height: 100vh; min-height: 100svh;
+  display: flex; flex-direction: column;
+}
+/* width:100% 필수 — 좌우 margin:auto 가 flex item 의 stretch 를 끄기 때문에,
+   지정하지 않으면 폭이 콘텐츠 크기(shrink-to-fit)로 줄어든다. max-width 560px 는 그대로. */
+body.fit-screen .container { flex: 1 1 auto; width: 100%; display: flex; flex-direction: column; min-height: 0; }
+body.fit-screen .step-panel.active { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+body.fit-screen .breed-grid { flex: 1 1 0; max-height: none; min-height: 72px; }
+body.fit-screen .btn-row { flex-shrink: 0; }
+/* 세로가 짧은 화면(가로 모드·소형 단말)에서는 고정 여백부터 줄여 그리드 자리를 확보한다 */
+@media (max-height: 720px) {
+  body.fit-screen .container { margin-top: 12px; margin-bottom: 12px; }
+  body.fit-screen .site-footer { padding-top: 18px; padding-bottom: 16px; }
+}
+
 /* ── Responsive / Motion ── */
 @media (max-width: 430px) {
   .container { margin: 14px auto; padding: 18px 16px 20px; border-radius: 18px; }

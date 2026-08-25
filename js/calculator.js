@@ -330,6 +330,8 @@ function goStep(n) {
   }
   document.getElementById('progLabel').innerHTML =
     '<strong>'+STEP_LABELS[n]+'</strong> · 5단계 중 '+(n+1)+'단계';
+  // 1단계만 뷰포트 높이에 맞춘다(푸터까지 한 화면). 2단계부터는 콘텐츠가 길어 일반 스크롤.
+  document.body.classList.toggle('fit-screen', n===0);
   if(n===3) renderIngGrid();
   if(n===4) renderResult();
   window.scrollTo({top:0,behavior:'smooth'});
