@@ -1,49 +1,77 @@
-/* ── 견종 데이터 (40종) ── */
+/* ── 견종 데이터 (40종) ──
+   이모지 없음: 40종 중 절반 이상이 같은 개 이모지로 겹쳐 식별에 기여하지 못했고,
+   일부는 견종을 돼지·핫도그로 표시해 브랜드 톤과 충돌했다.
+   카드 식별은 견종명 + size 태그(소형/중형/대형 색상 구분)가 담당한다. */
 var BREEDS = [
   // 소형견
-  {name:'말티즈',        emoji:'🐶',size:'소형',factor:1.0,  warn:'슬개골 탈구 주의. 부드럽고 가벼운 간식을 권장합니다.'},
-  {name:'포메라니안',    emoji:'🦊',size:'소형',factor:1.05, warn:'치아·잇몸 질환에 취약. 딱딱한 간식은 소량만 급여하세요.'},
-  {name:'토이푸들',      emoji:'🐩',size:'소형',factor:1.0,  warn:'귀 질환·피부 알러지 주의. 단일 단백질 간식을 추천합니다.'},
-  {name:'시츄',          emoji:'🐕',size:'소형',factor:0.95, warn:'비만 경향이 있습니다. 칼로리 밀도가 낮은 간식을 선택하세요.'},
-  {name:'비숑프리제',    emoji:'🤍',size:'소형',factor:0.95, warn:'피부·눈물자국 예민. 인공첨가물 없는 간식을 선택하세요.'},
-  {name:'치와와',        emoji:'🐕',size:'소형',factor:1.1,  warn:'저혈당 주의. 소량씩 자주 급여하는 것이 좋습니다.'},
-  {name:'닥스훈트',      emoji:'🌭',size:'소형',factor:0.9,  warn:'척추 디스크 취약. 과체중 방지를 위해 칼로리 관리가 필수입니다.'},
-  {name:'요크셔테리어',  emoji:'🐶',size:'소형',factor:1.05, warn:'치석·치주 질환 취약. 씹는 질감의 간식으로 치아를 관리하세요.'},
-  {name:'파피용',        emoji:'🦋',size:'소형',factor:1.1,  warn:'전반적으로 건강하나 슬개골 주의. 고단백 간식 적합.'},
-  {name:'미니핀',        emoji:'🐕',size:'소형',factor:1.15, warn:'활동량 많아 에너지 소모가 높습니다. 고단백 간식 권장.'},
-  {name:'퍼그',          emoji:'🐷',size:'소형',factor:0.85, warn:'호흡기·비만 취약. 저칼로리·소화 잘 되는 간식을 선택하세요.'},
-  {name:'페키니즈',      emoji:'🐕',size:'소형',factor:0.9,  warn:'호흡기 문제 주의. 딱딱한 간식 피하고 부드러운 것 권장.'},
-  {name:'미니어처슈나우저',emoji:'🐕',size:'소형',factor:0.95,warn:'췌장염·고지혈 취약. 저지방 간식이 필수입니다.'},
-  {name:'스피츠',        emoji:'🐶',size:'소형',factor:1.0,  warn:'전반적으로 건강한 편. 털 건강을 위한 오메가3 성분 권장.'},
-  {name:'이탈리안그레이하운드',emoji:'🐕',size:'소형',factor:1.05,warn:'근육 유지 중요. 고단백 간식과 칼슘 보충을 권장합니다.'},
-  {name:'라사압소',      emoji:'🐕',size:'소형',factor:0.95, warn:'피부·신장 건강 주의. 저염 간식을 권장합니다.'},
-  {name:'카바리에킹찰스',emoji:'🐕',size:'소형',factor:0.9,  warn:'심장 질환 취약. 저나트륨·저지방 간식이 중요합니다.'},
-  {name:'보스턴테리어',  emoji:'🐕',size:'소형',factor:0.9,  warn:'호흡기·비만 주의. 소화 잘 되는 소량 간식을 권장합니다.'},
+  {name:'말티즈',        size:'소형',factor:1.0,  warn:'슬개골 탈구 주의. 부드럽고 가벼운 간식을 권장합니다.'},
+  {name:'포메라니안',    size:'소형',factor:1.05, warn:'치아·잇몸 질환에 취약. 딱딱한 간식은 소량만 급여하세요.'},
+  {name:'토이푸들',      size:'소형',factor:1.0,  warn:'귀 질환·피부 알러지 주의. 단일 단백질 간식을 추천합니다.'},
+  {name:'시츄',          size:'소형',factor:0.95, warn:'비만 경향이 있습니다. 칼로리 밀도가 낮은 간식을 선택하세요.'},
+  {name:'비숑프리제',    size:'소형',factor:0.95, warn:'피부·눈물자국 예민. 인공첨가물 없는 간식을 선택하세요.'},
+  {name:'치와와',        size:'소형',factor:1.1,  warn:'저혈당 주의. 소량씩 자주 급여하는 것이 좋습니다.'},
+  {name:'닥스훈트',      size:'소형',factor:0.9,  warn:'척추 디스크 취약. 과체중 방지를 위해 칼로리 관리가 필수입니다.'},
+  {name:'요크셔테리어',  size:'소형',factor:1.05, warn:'치석·치주 질환 취약. 씹는 질감의 간식으로 치아를 관리하세요.'},
+  {name:'파피용',        size:'소형',factor:1.1,  warn:'전반적으로 건강하나 슬개골 주의. 고단백 간식 적합.'},
+  {name:'미니핀',        size:'소형',factor:1.15, warn:'활동량 많아 에너지 소모가 높습니다. 고단백 간식 권장.'},
+  {name:'퍼그',          size:'소형',factor:0.85, warn:'호흡기·비만 취약. 저칼로리·소화 잘 되는 간식을 선택하세요.'},
+  {name:'페키니즈',      size:'소형',factor:0.9,  warn:'호흡기 문제 주의. 딱딱한 간식 피하고 부드러운 것 권장.'},
+  {name:'미니어처슈나우저',size:'소형',factor:0.95,warn:'췌장염·고지혈 취약. 저지방 간식이 필수입니다.'},
+  {name:'스피츠',        size:'소형',factor:1.0,  warn:'전반적으로 건강한 편. 털 건강을 위한 오메가3 성분 권장.'},
+  {name:'이탈리안그레이하운드',size:'소형',factor:1.05,warn:'근육 유지 중요. 고단백 간식과 칼슘 보충을 권장합니다.'},
+  {name:'라사압소',      size:'소형',factor:0.95, warn:'피부·신장 건강 주의. 저염 간식을 권장합니다.'},
+  {name:'카바리에킹찰스',size:'소형',factor:0.9,  warn:'심장 질환 취약. 저나트륨·저지방 간식이 중요합니다.'},
+  {name:'보스턴테리어',  size:'소형',factor:0.9,  warn:'호흡기·비만 주의. 소화 잘 되는 소량 간식을 권장합니다.'},
   // 중형견
-  {name:'비글',          emoji:'🐕',size:'중형',factor:0.88, warn:'비만 경향 매우 강함. 간식 양을 엄격하게 제한해 주세요.'},
-  {name:'코카스파니엘',  emoji:'🐕',size:'중형',factor:0.9,  warn:'귀 염증·비만 주의. 저지방 간식과 귀 건강 성분 권장.'},
-  {name:'시바이누',      emoji:'🦊',size:'중형',factor:1.05, warn:'피부 알러지 취약. 단일 단백질·저알러지 간식을 선택하세요.'},
-  {name:'웰시코기',      emoji:'🐕',size:'중형',factor:0.9,  warn:'척추·관절 주의. 체중 관리가 건강의 핵심입니다.'},
-  {name:'바센지',        emoji:'🐕',size:'중형',factor:1.1,  warn:'신장 건강 주의. 저염 간식을 권장합니다.'},
-  {name:'잉글리시스프링거',emoji:'🐕',size:'중형',factor:1.0, warn:'귀 감염·체중 관리 필요. 저지방 간식 권장.'},
-  {name:'미니어처슈나우저(중형)',emoji:'🐕',size:'중형',factor:0.92,warn:'췌장염 취약. 저지방 간식이 필수입니다.'},
-  {name:'프렌치불독',    emoji:'🐷',size:'중형',factor:0.85, warn:'호흡기·비만 취약. 딱딱한 간식 주의, 저칼로리 권장.'},
-  {name:'불독',          emoji:'🐶',size:'중형',factor:0.85, warn:'호흡기 문제·과열 주의. 칼로리를 엄격히 관리하세요.'},
-  {name:'사모예드(중형)',emoji:'🐶',size:'중형',factor:1.05, warn:'당뇨 취약. 혈당 지수 낮은 자연 성분 간식을 권장합니다.'},
+  {name:'비글',          size:'중형',factor:0.88, warn:'비만 경향 매우 강함. 간식 양을 엄격하게 제한해 주세요.'},
+  {name:'코카스파니엘',  size:'중형',factor:0.9,  warn:'귀 염증·비만 주의. 저지방 간식과 귀 건강 성분 권장.'},
+  {name:'시바이누',      size:'중형',factor:1.05, warn:'피부 알러지 취약. 단일 단백질·저알러지 간식을 선택하세요.'},
+  {name:'웰시코기',      size:'중형',factor:0.9,  warn:'척추·관절 주의. 체중 관리가 건강의 핵심입니다.'},
+  {name:'바센지',        size:'중형',factor:1.1,  warn:'신장 건강 주의. 저염 간식을 권장합니다.'},
+  {name:'잉글리시스프링거',size:'중형',factor:1.0, warn:'귀 감염·체중 관리 필요. 저지방 간식 권장.'},
+  {name:'미니어처슈나우저',size:'중형',factor:0.92,warn:'췌장염 취약. 저지방 간식이 필수입니다.'},
+  {name:'프렌치불독',    size:'중형',factor:0.85, warn:'호흡기·비만 취약. 딱딱한 간식 주의, 저칼로리 권장.'},
+  {name:'불독',          size:'중형',factor:0.85, warn:'호흡기 문제·과열 주의. 칼로리를 엄격히 관리하세요.'},
+  {name:'사모예드',size:'중형',factor:1.05, warn:'당뇨 취약. 혈당 지수 낮은 자연 성분 간식을 권장합니다.'},
   // 대형견
-  {name:'골든리트리버',  emoji:'🦮',size:'대형',factor:0.9,  warn:'비만·관절 취약. 체중과 칼로리를 엄격히 관리해 주세요.'},
-  {name:'래브라도리트리버',emoji:'🐕‍🦺',size:'대형',factor:0.85,warn:'비만 경향 매우 강함. 간식 칼로리는 5% 이내로 제한하세요.'},
-  {name:'시베리안허스키',emoji:'🐺',size:'대형',factor:1.2,  warn:'아연 결핍 주의. 아연 함유 자연 성분 간식을 보충하세요.'},
-  {name:'저먼셰퍼드',    emoji:'🐕',size:'대형',factor:1.0,  warn:'고관절·소화기 취약. 고단백·저지방 간식을 권장합니다.'},
-  {name:'보더콜리',      emoji:'🐕',size:'대형',factor:1.3,  warn:'고활동량 견종. 운동 부족 시 스트레스성 과식에 주의하세요.'},
-  {name:'진돗개',        emoji:'🐕',size:'대형',factor:1.1,  warn:'특이사항 적음. 활동량이 높아 고단백 간식이 적합합니다.'},
-  {name:'사모예드',      emoji:'🤍',size:'대형',factor:1.05, warn:'당뇨 취약. 혈당 지수 낮은 자연 성분 간식을 권장합니다.'},
-  {name:'알래스칸말라뮤트',emoji:'🐺',size:'대형',factor:1.15,warn:'고활동량. 고단백·고에너지 간식이 필요합니다.'},
-  {name:'아키타',        emoji:'🐕',size:'대형',factor:1.0,  warn:'자가면역 질환 취약. 저알러지 성분 간식을 선택하세요.'},
-  {name:'로트와일러',    emoji:'🐕',size:'대형',factor:0.95, warn:'고관절·심장 주의. 체중 관리와 관절 보호 성분을 권장합니다.'},
-  {name:'달마시안',      emoji:'🐕',size:'대형',factor:1.0,  warn:'요로 결석 취약. 저퓨린 성분 간식이 필수입니다.'},
-  {name:'믹스견',        emoji:'🐾',size:'중형',factor:1.0,  warn:'유전적 특이사항 불명확. 체중·활동량 기준으로 관리하세요.'},
+  {name:'골든리트리버',  size:'대형',factor:0.9,  warn:'비만·관절 취약. 체중과 칼로리를 엄격히 관리해 주세요.'},
+  {name:'래브라도리트리버',size:'대형',factor:0.85,warn:'비만 경향 매우 강함. 간식 칼로리는 5% 이내로 제한하세요.'},
+  {name:'시베리안허스키',size:'대형',factor:1.2,  warn:'아연 결핍 주의. 아연 함유 자연 성분 간식을 보충하세요.'},
+  {name:'저먼셰퍼드',    size:'대형',factor:1.0,  warn:'고관절·소화기 취약. 고단백·저지방 간식을 권장합니다.'},
+  {name:'보더콜리',      size:'대형',factor:1.3,  warn:'고활동량 견종. 운동 부족 시 스트레스성 과식에 주의하세요.'},
+  {name:'진돗개',        size:'대형',factor:1.1,  warn:'특이사항 적음. 활동량이 높아 고단백 간식이 적합합니다.'},
+  {name:'사모예드',      size:'대형',factor:1.05, warn:'당뇨 취약. 혈당 지수 낮은 자연 성분 간식을 권장합니다.'},
+  {name:'알래스칸말라뮤트',size:'대형',factor:1.15,warn:'고활동량. 고단백·고에너지 간식이 필요합니다.'},
+  {name:'아키타',        size:'대형',factor:1.0,  warn:'자가면역 질환 취약. 저알러지 성분 간식을 선택하세요.'},
+  {name:'로트와일러',    size:'대형',factor:0.95, warn:'고관절·심장 주의. 체중 관리와 관절 보호 성분을 권장합니다.'},
+  {name:'달마시안',      size:'대형',factor:1.0,  warn:'요로 결석 취약. 저퓨린 성분 간식이 필수입니다.'},
+  {name:'믹스견',        size:'중형',factor:1.0,  warn:'유전적 특이사항 불명확. 체중·활동량 기준으로 관리하세요.'},
 ];
+
+/* ── 견종 카드 줄바꿈 지점 ──
+   카드 폭이 좁아 긴 견종명은 2줄이 된다. 브라우저 기본값에 맡기면 '미니어처슈나/우저',
+   '사모예드(중/형)'처럼 아무 데서나 끊기므로, 합성어 경계를 <wbr>로 알려준다.
+   '|' 가 후보 지점이고 필요할 때만 발동한다(넓으면 한 줄 유지).
+   name 자체는 검색·URL 파라미터·결과 표시에 쓰이므로 건드리지 않는다. */
+var BREED_WRAP = {
+  '요크셔테리어':          '요크셔|테리어',
+  '미니어처슈나우저':      '미니어처|슈나우저',
+  '이탈리안그레이하운드':  '이탈리안|그레이|하운드',
+  '카바리에킹찰스':        '카바리에|킹찰스',
+  '보스턴테리어':          '보스턴|테리어',
+  '코카스파니엘':          '코카|스파니엘',
+  '잉글리시스프링거':      '잉글리시|스프링거',
+  '프렌치불독':            '프렌치|불독',
+  '골든리트리버':          '골든|리트리버',
+  '래브라도리트리버':      '래브라도|리트리버',
+  '시베리안허스키':        '시베리안|허스키',
+  '저먼셰퍼드':            '저먼|셰퍼드',
+  '알래스칸말라뮤트':      '알래스칸|말라뮤트',
+};
+// 조각마다 이스케이프한 뒤 <wbr>로 잇는다 (조각을 합치면 원래 이름과 같아야 함)
+function breedNameHTML(name) {
+  return (BREED_WRAP[name] || name).split('|').map(escapeHtml).join('<wbr>');
+}
 
 /* ── 성분 데이터 ── */
 var INGREDIENTS = [
@@ -80,12 +108,14 @@ var state = { breed: BREEDS[0], neuter:'Y', activity:'normal', bcs: 5 };
 var currentStep = 0;
 var STEP_LABELS = ['견종 선택','기본 정보','생활 패턴','성분 선택','결과'];
 
+/* 상태 구분은 경고 이모지 대신 tone → .bcs-hint 색상 클래스로 처리.
+   tone: 'good'(초록) | 'note'(중립) | 'warn'(앰버) */
 var BCS_HINTS = {
-  2: '⚠️ 저체중입니다. 현재 체중 기준으로 계산하며, 수의사와 영양 상담을 권장합니다.',
-  4: '현재 체중 기준으로 계산합니다. 간식 급여량을 늘리는 것도 고려해 보세요.',
-  5: '✅ 이상적인 체형입니다. 현재 체중 기준으로 계산합니다.',
-  7: '⚠️ 과체중입니다. 이상체중으로 보정해 계산합니다. (현재 체중 × 0.85)',
-  9: '🚨 비만입니다. 이상체중으로 보정해 계산하며, 간식 허용량을 5%로 제한합니다. (현재 체중 × 0.70)',
+  2: {tone:'warn', text:'저체중입니다. 현재 체중 기준으로 계산하며, 수의사와 영양 상담을 권장합니다.'},
+  4: {tone:'note', text:'현재 체중 기준으로 계산합니다. 간식 급여량을 늘리는 것도 고려해 보세요.'},
+  5: {tone:'good', text:'이상적인 체형입니다. 현재 체중 기준으로 계산합니다.'},
+  7: {tone:'warn', text:'과체중입니다. 이상체중으로 보정해 계산합니다. (현재 체중 × 0.85)'},
+  9: {tone:'warn', text:'비만입니다. 이상체중으로 보정해 계산하며, 간식 허용량을 5%로 제한합니다. (현재 체중 × 0.70)'},
 };
 
 /* ── 입력값 검증 유틸 ── */
@@ -152,7 +182,7 @@ function showStepError(step, msg) {
     err = document.createElement('div');
     err.className = 'step-error alert amber';
     err.setAttribute('role', 'alert');
-    err.innerHTML = '<span class="alert-icon">⚠️</span><span class="step-error-msg"></span>';
+    err.innerHTML = '<span class="alert-icon" aria-hidden="true">⚠️</span><span class="step-error-msg"></span>';
     panel.insertBefore(err, panel.querySelector('.btn-row'));
   }
   err.querySelector('.step-error-msg').textContent = msg;
@@ -167,8 +197,9 @@ function selectBCS(el, bcs) {
   document.querySelectorAll('.bcs-card').forEach(function(c){c.classList.remove('selected');});
   el.classList.add('selected');
   var hint = document.getElementById('bcsHint');
-  hint.textContent = BCS_HINTS[bcs] || '';
-  hint.classList.add('show');
+  var h = BCS_HINTS[bcs] || {tone:'note', text:''};
+  hint.textContent = h.text;
+  hint.className = 'bcs-hint tone-' + h.tone + ' show';
 }
 
 /* ── 이상체중 보정 ── */
@@ -184,8 +215,7 @@ function initBreeds() {
   grid.innerHTML = BREEDS.map(function(b,i){
     var sizeClass = b.size==='소형'?'size-small':b.size==='중형'?'size-medium':'size-large';
     return '<div class="breed-card'+(i===0?' selected':'')+'" role="button" tabindex="0" aria-pressed="'+(i===0?'true':'false')+'" data-idx="'+i+'" data-name="'+escapeHtml(b.name)+'">' +
-      '<div class="breed-emoji">'+b.emoji+'</div>' +
-      '<div class="breed-name">'+escapeHtml(b.name)+'</div>' +
+      '<div class="breed-name">'+breedNameHTML(b.name)+'</div>' +
       '<span class="breed-size-tag '+sizeClass+'">'+escapeHtml(b.size)+'</span>' +
     '</div>';
   }).join('');
@@ -247,10 +277,11 @@ function renderIngGrid() {
     var isSel = existSelected[ing.val] ? ' selected' : '';
     var tipHTML = '';
 
+    // 배지 앞 기호는 장식(색상·텍스트가 이미 상태를 전달) — 스크린리더에서 숨김
     if(ing.safe==='danger') {
-      tipHTML = '<span class="ing-tip tip-danger">🚫 위험 성분</span>';
+      tipHTML = '<span class="ing-tip tip-danger"><span aria-hidden="true">🚫</span> 위험 성분</span>';
     } else if(ing.safe==='warn') {
-      tipHTML = '<span class="ing-tip tip-caution">⚠ 소량만</span>';
+      tipHTML = '<span class="ing-tip tip-caution"><span aria-hidden="true">⚠</span> 소량만</span>';
     } else {
       // 건강 상태 연동
       var matchedTip = '';
@@ -260,7 +291,7 @@ function renderIngGrid() {
         }
       });
       if(matchedTip) {
-        tipHTML = '<span class="ing-tip tip-recommend">✦ 추천</span>';
+        tipHTML = '<span class="ing-tip tip-recommend"><span aria-hidden="true">✦</span> 추천</span>';
       } else if(ing.health.length && ing.health.some(function(h){return health.indexOf(h)>-1;})){
         tipHTML = '<span class="ing-tip tip-info">도움</span>';
       }
@@ -268,7 +299,7 @@ function renderIngGrid() {
 
     return '<div class="ing-row-sel'+isSel+'" role="button" tabindex="0" aria-pressed="'+(isSel?'true':'false')+'" data-val="'+escapeHtml(ing.val)+'">' +
       '<div class="ing-left">' +
-        '<span class="ing-emoji">'+ing.emoji+'</span>' +
+        '<span class="ing-emoji" aria-hidden="true">'+ing.emoji+'</span>' +
         '<span class="ing-label">'+escapeHtml(ing.val)+'</span>' +
         tipHTML +
       '</div>' +
@@ -346,20 +377,20 @@ function renderResult() {
     if(s==='danger')hasDanger=true;
     if(s==='warn')hasWarn=true;
     var badge = s==='safe'
-      ? '<span class="ing-badge badge-safe">✓ 안전</span>'
+      ? '<span class="ing-badge badge-safe">안전</span>'
       : s==='warn'
-      ? '<span class="ing-badge badge-warn">⚠ 소량만</span>'
-      : '<span class="ing-badge badge-danger">✗ 위험</span>';
+      ? '<span class="ing-badge badge-warn">소량만</span>'
+      : '<span class="ing-badge badge-danger">위험</span>';
     return '<div class="ing-result-row"><span>'+v+'</span>'+badge+'</div>';
   }).join('');
 
   var ingAlert = ings.length===0
-    ? '<div class="alert gray"><span class="alert-icon">ℹ️</span><span>선택된 성분이 없습니다.</span></div>'
+    ? '<div class="alert gray"><span>선택된 성분이 없습니다.</span></div>'
     : hasDanger
-    ? '<div class="alert red"><span class="alert-icon">🚫</span><span>위험 성분이 포함되어 있습니다. 즉시 급여를 중단하고 수의사에게 문의하세요.</span></div>'
+    ? '<div class="alert red"><span>위험 성분이 포함되어 있습니다. 즉시 급여를 중단하고 수의사에게 문의하세요.</span></div>'
     : hasWarn
-    ? '<div class="alert amber"><span class="alert-icon">⚠️</span><span>주의 성분이 있습니다. 소량만 급여하고 반응을 지켜보세요.</span></div>'
-    : '<div class="alert green"><span class="alert-icon">✅</span><span>선택하신 성분은 모두 안전합니다.</span></div>';
+    ? '<div class="alert amber"><span>주의 성분이 있습니다. 소량만 급여하고 반응을 지켜보세요.</span></div>'
+    : '<div class="alert green"><span>선택하신 성분은 모두 안전합니다.</span></div>';
 
   /* 상품 추천 — nutti.co.kr 실판매 품목과 1:1 매칭 (가격 정보는 보안·정책상 노출하지 않음) */
   var ALL_RECS = [
@@ -405,24 +436,23 @@ function renderResult() {
   document.getElementById('resultBody').innerHTML =
     '<div class="result-hero">' +
       '<div class="result-hero-label">Daily Treat · 하루 권장 간식량</div>' +
-      '<div class="result-dog-name">'+breed.emoji+' '+nameSafe+' ('+escapeHtml(breed.name)+')</div>' +
+      '<div class="result-dog-name">'+nameSafe+' ('+escapeHtml(breed.name)+')</div>' +
       '<div class="result-big"><span class="result-num" id="resultNum">0</span><span class="result-unit">g / 일</span></div>' +
       '<div class="result-chips">' +
-        '<span class="r-chip">🔥 허용 칼로리 '+treatCal+' kcal</span>' +
+        '<span class="r-chip">허용 칼로리 '+treatCal+' kcal</span>' +
         '<span class="r-chip">하루 칼로리의 '+Math.round(treatPct*100)+'%</span>' +
       '</div>' +
     '</div>' +
 
     '<div class="stat-grid">' +
-      '<div class="stat-card"><div class="stat-label">🔥 하루 권장 칼로리</div><div class="stat-value">'+dailyCal+' kcal</div></div>' +
-      '<div class="stat-card"><div class="stat-label">⚖️ 체중'+(isBcsAdjusted?' (보정값)':'')+'</div><div class="stat-value">'+idealWeight.toFixed(1)+' kg'+(isBcsAdjusted?' <span style="font-size:10px;color:var(--text-light);">입력 '+weight.toFixed(1)+'kg</span>':'')+'</div></div>' +
-      '<div class="stat-card"><div class="stat-label">🐕 체형 (BCS)</div><div class="stat-value" style="font-size:13px;">'+bcsLabel+'</div></div>' +
-      '<div class="stat-card"><div class="stat-label">✂️ 중성화 / 활동량</div><div class="stat-value" style="font-size:13px;">'+(state.neuter==='Y'?'완료':'미완료')+' / '+actLabel+'</div></div>' +
+      '<div class="stat-card"><div class="stat-label">하루 권장 칼로리</div><div class="stat-value">'+dailyCal+' kcal</div></div>' +
+      '<div class="stat-card"><div class="stat-label">체중'+(isBcsAdjusted?' (보정값)':'')+'</div><div class="stat-value">'+idealWeight.toFixed(1)+' kg'+(isBcsAdjusted?' <span style="font-size:10px;color:var(--text-light);">입력 '+weight.toFixed(1)+'kg</span>':'')+'</div></div>' +
+      '<div class="stat-card"><div class="stat-label">체형 (BCS)</div><div class="stat-value" style="font-size:13px;">'+bcsLabel+'</div></div>' +
+      '<div class="stat-card"><div class="stat-label">중성화 / 활동량</div><div class="stat-value" style="font-size:13px;">'+(state.neuter==='Y'?'완료':'미완료')+' / '+actLabel+'</div></div>' +
     '</div>' +
 
     (isBcsAdjusted ?
       '<div class="alert amber" style="margin-bottom:14px;">' +
-        '<span class="alert-icon">⚖️</span>' +
         '<span><strong>이상체중으로 보정했습니다.</strong><br>' +
         '입력 체중 '+weight.toFixed(1)+'kg → 보정 체중 '+idealWeight.toFixed(1)+'kg 기준으로 계산했습니다. ' +
         '과체중 상태에서 현재 체중 기준으로 칼로리를 계산하면 실제보다 더 많이 급여하게 됩니다.</span>' +
@@ -430,7 +460,7 @@ function renderResult() {
     : '') +
 
     '<div class="alert blue" style="margin-bottom:14px;">' +
-      '<span class="alert-icon">🐾</span>' +
+      '<span class="alert-icon" aria-hidden="true">🐾</span>' +
       '<span><strong>'+escapeHtml(breed.name)+' 주의사항</strong><br>'+escapeHtml(breed.warn)+'</span>' +
     '</div>' +
 
@@ -456,7 +486,7 @@ function renderResult() {
         : '<div class="rec-item">'+inner+'</div>';
     }).join('') +
 
-    '<div class="disclaimer"><span style="flex-shrink:0;">🩺</span><span>본 결과는 수의영양학 공식(RER = 70 × 체중^0.75) 기반 참고값입니다. 정확한 급여량은 담당 수의사와 상담하세요.</span></div>';
+    '<div class="disclaimer"><span>본 결과는 수의영양학 공식(RER = 70 × 체중^0.75) 기반 참고값입니다. 정확한 급여량은 담당 수의사와 상담하세요.</span></div>';
 
   setTimeout(function(){
     var el = document.getElementById('accFill');

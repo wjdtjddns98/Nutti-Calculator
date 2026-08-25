@@ -97,15 +97,13 @@ function cardHTML(p, isRec, show, concerns) {
     ? '<div class="card-footer"><a class="card-link" href="'+escapeHtml(link)+'" target="_blank" rel="noopener noreferrer">누띠에서 보러가기 →</a></div>'
     : '';
   // 추천 이유 배지: 강아지 고민 중 이 제품이 맞는 항목(최대 2개)
-  var reason = (concerns && concerns.length)
-    ? '✦ ' + concerns.slice(0,2).join('·') + ' 맞춤'
-    : '';
-  var reasonHTML = reason
-    ? '<div class="reason-tag">'+escapeHtml(reason)+'</div>'
+  // 앞머리 ✦는 장식이라 스크린리더에서 숨김 — 낭독되는 건 "관절·피부 맞춤"뿐
+  var reasonHTML = (concerns && concerns.length)
+    ? '<div class="reason-tag"><span aria-hidden="true">✦</span> '+escapeHtml(concerns.slice(0,2).join('·')+' 맞춤')+'</div>'
     : '';
   return '<div class="product-card'+(isRec?' matched':'')+(show?'':' hidden')+'">' +
     '<div class="card-img" style="background-color:'+safeColor(p.color)+';">' +
-      '<span>'+p.emoji+'</span>' +
+      '<span aria-hidden="true">'+p.emoji+'</span>' +
       '<span class="cat-badge cat-'+escapeHtml(p.cat)+'">'+escapeHtml(p.catLabel)+'</span>'+
     '</div>'+
     '<div class="card-body">'+
