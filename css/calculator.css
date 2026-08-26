@@ -6,6 +6,9 @@ body {
   background: radial-gradient(1100px 480px at 50% -120px, #EFE6DC 0%, var(--bg) 65%) fixed, var(--bg);
   -webkit-font-smoothing: antialiased;
   word-break: keep-all; overflow-wrap: break-word;
+  /* 좌우 거터 — 뷰포트가 카드(560px)보다 좁아도 카드가 화면 끝에 붙지 않게 한다.
+     .container 의 margin:auto 는 남는 폭이 없으면 0 이라 여기서 확보해야 한다. */
+  padding-inline: 16px;
 }
 :focus-visible { outline: none; box-shadow: var(--ring); border-radius: 8px; }
 /* 모바일 탭 300ms 지연 제거 + 카드류 더블탭 확대 방지 */
@@ -193,9 +196,10 @@ input[type=range]::-moz-range-thumb {
 }
 .ing-row-sel:hover { border-color: var(--green-mid); transform: translateX(2px); }
 .ing-row-sel.selected { border-color: var(--green); background: var(--green-light); }
-.ing-left { display: flex; align-items: center; gap: 11px; }
-.ing-emoji { font-size: 19px; }
-.ing-label { font-size: 14px; font-weight: 500; color: var(--text); }
+/* min-width:0 + wrap — 성분명이 길거나 배지가 붙는 조합에서 좁은 화면일 때 행 밖으로 밀려나지 않게 */
+.ing-left { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; row-gap: 5px; min-width: 0; }
+.ing-emoji { font-size: 19px; flex-shrink: 0; }
+.ing-label { font-size: 14px; font-weight: 500; color: var(--text); min-width: 0; }
 .ing-row-sel.selected .ing-label { color: var(--green-dark); font-weight: 600; }
 .ing-tip { font-size: 11px; padding: 3px 9px; border-radius: 99px; font-weight: 600; white-space: nowrap; }
 .tip-recommend { background: var(--safe-light); color: var(--safe-dark); }
@@ -260,9 +264,10 @@ input[type=range]::-moz-range-thumb {
 .section-title { font-size: 11.5px; font-weight: 700; color: var(--text-light); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
 .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-.ing-result-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.ing-result-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 .ing-result-row:last-child { border-bottom: none; }
-.ing-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
+.ing-result-row > span:first-child { min-width: 0; }
+.ing-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
 .badge-safe { background: var(--safe-light); color: var(--safe-dark); }
 .badge-warn { background: var(--amber-light); color: var(--amber-dark); }
 .badge-danger { background: var(--red-dark); color: var(--red-light); }
@@ -276,7 +281,8 @@ input[type=range]::-moz-range-thumb {
 a.rec-item { text-decoration: none; color: inherit; cursor: pointer; }
 .rec-item-body { flex: 1; }
 .rec-item-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.rec-item-name { font-family: 'Gowun Dodum', serif; font-size: 14.5px; color: var(--text); }
+/* 배지는 nowrap·flex-shrink:0 이므로 이름 쪽에 min-width:0 이 없으면 좁은 화면에서 행이 넘친다 */
+.rec-item-name { font-family: 'Gowun Dodum', serif; font-size: 14.5px; color: var(--text); min-width: 0; }
 .rec-item-desc { font-size: 12px; color: var(--text-light); margin-top: 2px; line-height: 1.5; }
 .rec-item-cta { font-size: 12px; font-weight: 600; color: var(--green-dark); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
 .rec-badge { font-size: 11px; padding: 4px 11px; border-radius: 99px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
@@ -292,7 +298,7 @@ a.rec-item { text-decoration: none; color: inherit; cursor: pointer; }
 /* ── Buttons ── */
 .btn-row { display: flex; gap: 10px; margin-top: 26px; }
 .btn {
-  flex: 1; height: 52px; border-radius: 99px; font-size: 15px; font-weight: 600; cursor: pointer;
+  flex: 1; height: 52px; padding: 0 12px; border-radius: 99px; font-size: 15px; font-weight: 600; cursor: pointer;
   font-family: 'Noto Sans KR', sans-serif; transition: all .18s var(--ease);
   border: 1.5px solid var(--border); background: var(--surface); color: var(--text-muted);
 }
@@ -303,8 +309,10 @@ a.rec-item { text-decoration: none; color: inherit; cursor: pointer; }
   box-shadow: 0 6px 18px rgba(86,68,56,.3);
 }
 .btn.primary:hover { transform: translateY(-1px); background: var(--green-dark); box-shadow: 0 10px 24px rgba(86,68,56,.38); }
+/* flex 1.5 — '맞춤 간식 보러가기 →'가 '← 다시 계산'보다 길어서 5:5로 나누면
+   좁은 화면에서 글자가 알약 가장자리에 닿는다. 넓은 화면에선 CTA 강조로도 읽힌다. */
 .btn.cta {
-  background: var(--terra); color: #fff; border: none; font-weight: 700;
+  flex: 1.5; background: var(--terra); color: #fff; border: none; font-weight: 700;
   box-shadow: 0 6px 18px rgba(176,92,56,.35);
 }
 .btn.cta:hover { transform: translateY(-1px); background: var(--terra-dark); box-shadow: 0 10px 24px rgba(176,92,56,.45); }
@@ -318,13 +326,16 @@ a.rec-item { text-decoration: none; color: inherit; cursor: pointer; }
 }
 .bcs-card:hover { border-color: var(--green-mid); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
 .bcs-card.selected { border-color: var(--green); background: var(--green-light); box-shadow: var(--ring); }
-.bcs-silhouette { width: 44px; height: 28px; border-radius: 999px; margin: 0 auto 8px; position: relative; display: flex; align-items: center; justify-content: center; }
+.bcs-silhouette { height: 28px; border-radius: 999px; margin: 0 auto 8px; position: relative; display: flex; align-items: center; justify-content: center; }
 .bcs-spine { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); height: 2px; width: 70%; border-radius: 99px; background: rgba(0,0,0,.12); }
-.bcs-thin   { background: #dde8f0; width: 34px; }
-.bcs-slim   { background: #c9e6da; width: 40px; }
-.bcs-ideal  { background: var(--olive); width: 44px; }
-.bcs-chubby { background: #f5d9b0; width: 50px; }
-.bcs-obese  { background: #f0b8a0; width: 58px; border-radius: 40px; }
+/* 폭은 컬럼 대비 비율 + px 상한. 5열 그리드라 좁은 화면에서 컬럼 내부 폭이 40px 대까지 떨어지는데,
+   고정 px 만 쓰면 큰 실루엣(비만 58px)이 카드 밖으로 넘친다. 비율로 두면 좁아져도
+   다섯 단계의 크기 차이가 그대로 유지되고, max-width 덕에 넓은 화면에선 원래 치수 그대로다. */
+.bcs-thin   { background: #dde8f0; width: 58%;  max-width: 34px; }
+.bcs-slim   { background: #c9e6da; width: 69%;  max-width: 40px; }
+.bcs-ideal  { background: var(--olive); width: 76%; max-width: 44px; }
+.bcs-chubby { background: #f5d9b0; width: 86%;  max-width: 50px; }
+.bcs-obese  { background: #f0b8a0; width: 100%; max-width: 58px; border-radius: 40px; }
 .bcs-label { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
 .bcs-card.selected .bcs-label { color: var(--green-dark); }
 .bcs-sub { font-size: 9.5px; color: var(--text-light); line-height: 1.5; }
@@ -365,14 +376,66 @@ body.fit-screen .btn-row { flex-shrink: 0; }
 
 /* ── Responsive / Motion ── */
 @media (max-width: 430px) {
-  .container { margin: 14px auto; padding: 18px 16px 20px; border-radius: 18px; }
+  body { padding-inline: 12px; }
+  .container { margin: 14px auto; padding: 18px 15px 20px; border-radius: 18px; }
+  .site-footer { padding: 30px 4px 26px; }
   .step-heading h1 { font-size: 21px; }
   .bcs-grid { gap: 5px; }
   .bcs-card { padding: 10px 3px 8px; }
+  .bcs-silhouette { height: 24px; }
   .bcs-sub { font-size: 8.5px; }
   .breed-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+  .result-hero { padding: 24px 18px 22px; }
   .result-num { font-size: 50px; }
+}
+/* 소형 단말(360px 이하) — 5열 BCS·5단계 진행바가 가장 먼저 압박받는 구간이라
+   고정 치수(도트·실루엣·헤딩)를 한 단계 더 줄여 자리를 만든다 */
+@media (max-width: 360px) {
+  body { padding-inline: 10px; }
+  .container { padding: 16px 13px 18px; }
+  .app-tagline { font-size: 10.5px; }
+  .step-dot { width: 26px; height: 26px; font-size: 11px; }
+  .step-line { margin: 0 3px; }
+  .step-heading h1 { font-size: 19px; }
+  .step-heading p { font-size: 12.5px; }
+  .bcs-grid { gap: 4px; }
+  .bcs-card { padding: 9px 2px 7px; }
+  .bcs-silhouette { height: 21px; margin-bottom: 6px; }
+  .bcs-label { font-size: 10px; }
+  .bcs-sub { font-size: 8px; }
+  .breed-grid { grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 6px; }
+  .range-wrap { gap: 10px; padding: 13px 12px; }
+  .range-display { min-width: 56px; font-size: 14px; padding: 5px 9px; }
+  .result-num { font-size: 44px; }
+  .btn { font-size: 14px; }
+}
+/* 560px보다 짧으면(폰 가로 모드, 낮은 데스크톱 창) 한 화면에 넣는 걸 포기한다.
+   고정 크롬만 400px 가까이라 견종 그리드가 min-height 72px 바닥까지 눌리는데,
+   그래놓고도 페이지가 스크롤돼서 '그리드 내부 스크롤 + 페이지 스크롤' 이중 스크롤이 된다.
+   한 줄짜리 그리드는 스크롤 한 번 아끼는 값어치가 없으므로 평범한 세로 스크롤로 되돌린다. */
+@media (max-height: 560px) {
+  body.fit-screen { display: block; }
+  body.fit-screen .container,
+  body.fit-screen .step-panel.active { display: block; }
+  body.fit-screen .breed-grid { flex: none; max-height: 240px; }
+}
+/* 세로가 짧을 때(구형 소형 단말 320x568 등) — 견종 그리드는 이미 min-height 72px 바닥에
+   닿아 있어서, 1단계를 한 화면에 넣으려면 고정 크롬(여백·푸터)을 더 깎는 수밖에 없다.
+   푸터에 body.fit-screen 선택자를 그대로 쓰는 이유는 위쪽 max-height:720px 블록과
+   명시도를 맞춰 나중에 선언된 이 값이 이기게 하기 위함이다. */
+@media (max-height: 620px) {
+  .app-head { padding-bottom: 10px; margin-bottom: 12px; }
+  .progress-wrap { margin-bottom: 13px; }
+  .step-heading { margin-bottom: 13px; }
+  .btn-row { margin-top: 16px; }
+  body.fit-screen .container { margin-top: 8px; margin-bottom: 8px; }
+  body.fit-screen .site-footer { padding-top: 12px; padding-bottom: 12px; line-height: 1.7; }
+}
+/* 터치 기기에서 최소 44px 터치 타깃 (WCAG 2.5.8) — 시각 크기는 유지, 히트 영역만 확장 */
+@media (pointer: coarse) {
+  .tag { display: inline-flex; align-items: center; min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
 }
